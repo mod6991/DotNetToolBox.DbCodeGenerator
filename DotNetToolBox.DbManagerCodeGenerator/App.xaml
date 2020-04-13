@@ -1,0 +1,9 @@
+﻿<Application x:Class="DotNetToolBox.DbManagerCodeGenerator.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DotNetToolBox.DbManagerCodeGenerator"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
