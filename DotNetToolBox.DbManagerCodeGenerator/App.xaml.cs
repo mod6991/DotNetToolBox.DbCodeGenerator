@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace DotNetToolBox.DbManagerCodeGenerator
 {
@@ -9,10 +10,18 @@ namespace DotNetToolBox.DbManagerCodeGenerator
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            MainWindow window = new MainWindow();
-            ViewModel.MainWindowViewModel vm = new ViewModel.MainWindowViewModel(window);
-            window.DataContext = vm;
-            window.Show();
+            try
+            {
+                MainWindow window = new MainWindow();
+                ViewModel.MainWindowViewModel vm = new ViewModel.MainWindowViewModel(window);
+                window.DataContext = vm;
+                window.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown();
+            }
 
             base.OnStartup(e);
         }

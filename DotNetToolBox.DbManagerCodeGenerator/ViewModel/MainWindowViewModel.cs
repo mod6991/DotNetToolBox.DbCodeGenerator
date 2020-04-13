@@ -258,7 +258,15 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
 
         private void Reset()
         {
-
+            try
+            {
+                LoadAppSettings();
+                ObjectTableList.Clear();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void Generate()
@@ -328,22 +336,43 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
 
         private void Exit()
         {
-            VisualObject.Close();
-            Application.Current.Shutdown();
+            try
+            {
+                VisualObject.Close();
+                Application.Current.Shutdown();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void AddObjectTable()
         {
-            ObjectTableList.Add(new ObjectTable(ObjectName, TableName, Query));
-            ObjectName = string.Empty;
-            TableName = string.Empty;
-            Query = string.Empty;
+            try
+            {
+                ObjectTableList.Add(new ObjectTable(ObjectName, TableName, Query));
+                ObjectName = string.Empty;
+                TableName = string.Empty;
+                Query = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void RemoveObjectTable()
         {
-            if (SelectedObjectTable != null)
-                ObjectTableList.Remove(SelectedObjectTable);
+            try
+            {
+                if (SelectedObjectTable != null)
+                    ObjectTableList.Remove(SelectedObjectTable);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
