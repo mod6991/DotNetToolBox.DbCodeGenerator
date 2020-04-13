@@ -5,8 +5,107 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DotNetToolBox.DbManagerCodeGenerator"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="{Binding Title}" Height="740" Width="600">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem.Items>
+                    <MenuItem Header="Reset" Command="{Binding ResetCommand}" />
+                    <MenuItem Header="Generate" Command="{Binding GenerateCommand}" />
+                    <Separator />
+                    <MenuItem Header="Exit" Command="{Binding ExitCommand}" />
+                </MenuItem.Items>
+            </MenuItem>
+        </Menu>
+        <ScrollViewer>
+            <StackPanel Orientation="Vertical" Margin="4">
+                <GroupBox Header=" Source database ">
+                    <Grid Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="4 0 4 0" Text="Connection string :" />
+                        <TextBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" Text="{Binding ConnectionString}" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="4 0 4 0" Text="Provider :" />
+                        <TextBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" Text="{Binding Provider}" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="4 0 4 0" Text="Parameter prefix :" />
+                        <TextBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" Text="{Binding ParameterPrefix}" />
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header=" Common ">
+                    <Grid Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="4 0 4 0" Text="Objects namespace :" />
+                        <TextBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" Text="{Binding ObjectsNamespace}" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="4 0 4 0" Text="Db layer namespace :" />
+                        <TextBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" Text="{Binding DbLayerNamespace}" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="4 0 4 0" Text="Db layer object name :" />
+                        <TextBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" Text="{Binding DbLayerObjectName}" />
+                        <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseSelectAll}" Content="Select all" />
+                        <CheckBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseSelectById}" Content="Select by id" />
+                        <CheckBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseInsert}" Content="Insert" />
+                        <CheckBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseUpdateSingle}" Content="Update single" />
+                        <CheckBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseUpdateAll}" Content="Update all" />
+                        <CheckBox Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseDelete}" Content="Delete" />
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header=" Tables ">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="80" />
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="100" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>  
+                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="4 0 4 0" Text="Object name :" />
+                        <TextBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" Text="{Binding ObjectName}" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="4 0 4 0" Text="Table name :" />
+                        <TextBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" Text="{Binding TableName}" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Top" Margin="4" Text="Query :" />
+                        <TextBox Grid.Row="2" Grid.Column="1" Margin="4" Text="{Binding Query}" AcceptsReturn="True"
+                                 ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Visible"/>
+                        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" Content="Add" Command="{Binding AddObjectTableCommand}" />
+                        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" Content="Remove" Command="{Binding RemoveObjectTableCommand}" />
+                        <DataGrid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="4" AutoGenerateColumns="False" IsReadOnly="True"
+                                  ItemsSource="{Binding ObjectTableList}" SelectedItem="{Binding SelectedObjectTable}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Object name" Width="140" Binding="{Binding ObjectName}" />
+                                <DataGridTextColumn Header="Table name" Width="140" Binding="{Binding TableName}" />
+                                <DataGridTextColumn Header="Query" Width="200" Binding="{Binding Query}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
 </Window>

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
 namespace DotNetToolBox.DbManagerCodeGenerator
 {
@@ -13,5 +7,14 @@ namespace DotNetToolBox.DbManagerCodeGenerator
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            MainWindow window = new MainWindow();
+            ViewModel.MainWindowViewModel vm = new ViewModel.MainWindowViewModel(window);
+            window.DataContext = vm;
+            window.Show();
+
+            base.OnStartup(e);
+        }
     }
 }
