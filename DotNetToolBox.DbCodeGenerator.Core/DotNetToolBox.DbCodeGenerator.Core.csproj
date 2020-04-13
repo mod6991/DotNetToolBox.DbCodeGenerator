@@ -97,6 +97,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeGenerationSettings.cs" />
+    <Compile Include="DbField.cs" />
+    <Compile Include="DbItem.cs" />
     <Compile Include="ObjectTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

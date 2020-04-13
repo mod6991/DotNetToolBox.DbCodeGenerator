@@ -1,9 +1,13 @@
-﻿using DotNetToolBox.DbCodeGenerator.Core;
+﻿using DotNetToolBox.Database;
+using DotNetToolBox.DbCodeGenerator.Core;
 using DotNetToolBox.MVVM;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
+using System.Data;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
@@ -259,7 +263,67 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
 
         private void Generate()
         {
+            DbManager db = null;
 
+            try
+            {
+                if (_connectionString.Contains("%USERNAME%") || _connectionString.Contains("%PASSWORD%"))
+                {
+                    View.PasswordWindow passWindow = new View.PasswordWindow();
+                    PasswordWindowViewModel passVM = new PasswordWindowViewModel(passWindow);
+                    passWindow.DataContext = passVM;
+                    passWindow.Owner = VisualObject;
+                    bool? sd = passWindow.ShowDialog();
+
+                    string connectionString = _connectionString.Replace("%USERNAME%", passVM.Username).Replace("%PASSWORD%", passVM.Password);
+
+                    db = new DbManager(connectionString, _provider);
+                }
+                else
+                    db = new DbManager(ConnectionString, Provider);
+
+                List<DbItem> dbItems = new List<DbItem>();
+
+                db.Open();
+
+                foreach(ObjectTable ot in ObjectTableList)
+                {
+                    DbItem dbItem = new DbItem();
+                    dbItem.ObjectName = ot.ObjectName;
+                    dbItem.TableName = ot.TableName;
+                    dbItem.UseSelectAll = UseSelectAll;
+                    dbItem.UseSelectById = UseSelectById;
+                    dbItem.UseInsert = UseInsert;
+                    dbItem.UseUpdateSingle = UseUpdateSingle;
+                    dbItem.UseUpdateAll = UseUpdateAll;
+                    dbItem.UseDelete = UseDelete;
+
+                    DataTable dt = new DataTable();
+                    db.FillDataTableWithRequest(ot.Query, null, dt);
+
+                    foreach (DataColumn col in dt.Columns)
+                        dbItem.Fields.Add(new DbField(col.DataType.Name, col.ColumnName));
+
+                    dbItems.Add(dbItem);
+                }
+
+                db.Close();
+
+                System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog();
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    DbmCodeGenerator dbm = new DbmCodeGenerator(dbItems, _codeGenerationSettings, ObjectsNamespace, DbLayerNamespace, DbLayerObjectName, dialog.SelectedPath);
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                if (db != null)
+                    db.Dispose();
+            }
         }
 
         private void Exit()
@@ -271,7 +335,9 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
         private void AddObjectTable()
         {
             ObjectTableList.Add(new ObjectTable(ObjectName, TableName, Query));
-
+            ObjectName = string.Empty;
+            TableName = string.Empty;
+            Query = string.Empty;
         }
 
         private void RemoveObjectTable()
