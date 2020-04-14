@@ -15,6 +15,7 @@ namespace DotNetToolBox.DbCodeGenerator.Core
 
         public string ObjectName { get; set; }
         public string TableName { get; set; }
+        public string Query { get; set; }
         public List<DbField> Fields { get; set; }
         public bool UseSelectAll { get; set; }
         public bool UseSelectById { get; set; }

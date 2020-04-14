@@ -30,7 +30,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
         private string _objectName;
         private string _tableName;
         private string _query;
-        private ObjectTable _selectedObjectTable;
+        private DbItem _selectedDbItem;
         private CodeGenerationSettings _codeGenerationSettings;
 
         public MainWindowViewModel(Window window)
@@ -42,7 +42,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
             AddObjectTableCommand       = new RelayCommand((param) => AddObjectTable(),     (param) => ReturnTrue());
             RemoveObjectTableCommand    = new RelayCommand((param) => RemoveObjectTable(),  (param) => ReturnTrue());
 
-            ObjectTableList = new ObservableCollection<ObjectTable>();
+            DbItemList = new ObservableCollection<DbItem>();
 
             LoadAppSettings();
         }
@@ -59,7 +59,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
 
         public string ConnectionString
         {
-            get { return _connectionString; ; }
+            get { return _connectionString; }
             set
             {
                 _connectionString = value;
@@ -207,15 +207,15 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
             }
         }
 
-        public ObservableCollection<ObjectTable> ObjectTableList { get; }
+        public ObservableCollection<DbItem> DbItemList { get; }
 
-        public ObjectTable SelectedObjectTable
+        public DbItem SelectedDbItem
         {
-            get { return _selectedObjectTable; }
+            get { return _selectedDbItem; }
             set
             {
-                _selectedObjectTable = value;
-                OnPropertyChanged(nameof(SelectedObjectTable));
+                _selectedDbItem = value;
+                OnPropertyChanged(nameof(SelectedDbItem));
             }
         }
 
@@ -234,12 +234,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
             ObjectsNamespace = ConfigurationManager.AppSettings["DefaultObjectsNamespace"];
             DbLayerNamespace = ConfigurationManager.AppSettings["DefaultDbLayerNamespace"];
             DbLayerObjectName = ConfigurationManager.AppSettings["DefaultDbLayerObjectName"];
-            UseSelectAll = bool.Parse(ConfigurationManager.AppSettings["DefaultUseSelectAll"]);
-            UseSelectById = bool.Parse(ConfigurationManager.AppSettings["DefaultUseSelectById"]);
-            UseInsert = bool.Parse(ConfigurationManager.AppSettings["DefaultUseInsert"]);
-            UseUpdateSingle = bool.Parse(ConfigurationManager.AppSettings["DefaultUseUpdateSingle"]);
-            UseUpdateAll = bool.Parse(ConfigurationManager.AppSettings["DefaultUseUpdateAll"]);
-            UseDelete = bool.Parse(ConfigurationManager.AppSettings["DefaultUseDelete"]);
+            LoadObjectSpecificSettings();
 
             _codeGenerationSettings = new CodeGenerationSettings
             {
@@ -249,6 +244,16 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
                 SqlIndentType = ConfigurationManager.AppSettings["SqlIndentType"],
                 SqlIndentSize = Int32.Parse(ConfigurationManager.AppSettings["SqlIndentSize"])
             };
+        }
+
+        private void LoadObjectSpecificSettings()
+        {
+            UseSelectAll = bool.Parse(ConfigurationManager.AppSettings["DefaultUseSelectAll"]);
+            UseSelectById = bool.Parse(ConfigurationManager.AppSettings["DefaultUseSelectById"]);
+            UseInsert = bool.Parse(ConfigurationManager.AppSettings["DefaultUseInsert"]);
+            UseUpdateSingle = bool.Parse(ConfigurationManager.AppSettings["DefaultUseUpdateSingle"]);
+            UseUpdateAll = bool.Parse(ConfigurationManager.AppSettings["DefaultUseUpdateAll"]);
+            UseDelete = bool.Parse(ConfigurationManager.AppSettings["DefaultUseDelete"]);
         }
 
         private bool ReturnTrue()
@@ -261,7 +266,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
             try
             {
                 LoadAppSettings();
-                ObjectTableList.Clear();
+                DbItemList.Clear();
             }
             catch(Exception ex)
             {
@@ -290,29 +295,15 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
                 else
                     db = new DbManager(ConnectionString, Provider);
 
-                List<DbItem> dbItems = new List<DbItem>();
-
                 db.Open();
 
-                foreach(ObjectTable ot in ObjectTableList)
+                foreach(DbItem dbi in DbItemList)
                 {
-                    DbItem dbItem = new DbItem();
-                    dbItem.ObjectName = ot.ObjectName;
-                    dbItem.TableName = ot.TableName;
-                    dbItem.UseSelectAll = UseSelectAll;
-                    dbItem.UseSelectById = UseSelectById;
-                    dbItem.UseInsert = UseInsert;
-                    dbItem.UseUpdateSingle = UseUpdateSingle;
-                    dbItem.UseUpdateAll = UseUpdateAll;
-                    dbItem.UseDelete = UseDelete;
-
                     DataTable dt = new DataTable();
-                    db.FillDataTableWithRequest(ot.Query, null, dt);
+                    db.FillDataTableWithRequest(dbi.Query, null, dt);
 
                     foreach (DataColumn col in dt.Columns)
-                        dbItem.Fields.Add(new DbField(col.DataType.Name, col.ColumnName));
-
-                    dbItems.Add(dbItem);
+                        dbi.Fields.Add(new DbField(col.DataType.Name, col.ColumnName));
                 }
 
                 db.Close();
@@ -320,7 +311,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
                 System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog();
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    DbmCodeGenerator dbm = new DbmCodeGenerator(dbItems, _codeGenerationSettings, ObjectsNamespace, DbLayerNamespace, DbLayerObjectName, dialog.SelectedPath);
+                    DbmCodeGenerator dbm = new DbmCodeGenerator(DbItemList, _codeGenerationSettings, ObjectsNamespace, DbLayerNamespace, DbLayerObjectName, dialog.SelectedPath);
                 }
             }
             catch(Exception ex)
@@ -351,10 +342,22 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
         {
             try
             {
-                ObjectTableList.Add(new ObjectTable(ObjectName, TableName, Query));
+                DbItem dbi = new DbItem();
+                dbi.ObjectName = ObjectName;
+                dbi.TableName = TableName;
+                dbi.Query = Query;
+                dbi.UseSelectAll = UseSelectAll;
+                dbi.UseSelectById = UseSelectById;
+                dbi.UseInsert = UseInsert;
+                dbi.UseUpdateSingle = UseUpdateSingle;
+                dbi.UseUpdateAll = UseUpdateAll;
+                dbi.UseDelete = UseDelete;
+
+                DbItemList.Add(dbi);
                 ObjectName = string.Empty;
                 TableName = string.Empty;
                 Query = string.Empty;
+                LoadObjectSpecificSettings();
             }
             catch (Exception ex)
             {
@@ -366,8 +369,8 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
         {
             try
             {
-                if (SelectedObjectTable != null)
-                    ObjectTableList.Remove(SelectedObjectTable);
+                if (SelectedDbItem != null)
+                    DbItemList.Remove(SelectedDbItem);
             }
             catch (Exception ex)
             {
