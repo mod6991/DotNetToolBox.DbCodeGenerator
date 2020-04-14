@@ -164,7 +164,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                             first = false;
                         }
 
-                        if (dbi.UseUpdateSingle)
+                        if (dbi.UseUpdate)
                         {
                             if (!first)
                                 sw.WriteLine();
@@ -179,14 +179,6 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                             sw.WriteLine($"{WriteIndentCs(3)}_db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Insert{dbi.ObjectName}\", parameters);");
                             sw.WriteLine($"{WriteIndentCs(2)}}}"); //end Insert
                             first = false;
-                        }
-
-                        if (dbi.UseUpdateAll)
-                        {
-                            if (!first)
-                                sw.WriteLine();
-
-
                         }
 
                         if (dbi.UseDelete)

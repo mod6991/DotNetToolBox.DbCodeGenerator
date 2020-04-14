@@ -20,8 +20,7 @@ namespace DotNetToolBox.DbCodeGenerator.Core
         public bool UseSelectAll { get; set; }
         public bool UseSelectById { get; set; }
         public bool UseInsert { get; set; }
-        public bool UseUpdateSingle { get; set; }
-        public bool UseUpdateAll { get; set; }
+        public bool UseUpdate{ get; set; }
         public bool UseDelete { get; set; }
     }
 }

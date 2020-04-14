@@ -25,8 +25,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
         private bool _useSelectAll;
         private bool _useSelectById;
         private bool _useInsert;
-        private bool _useUpdateSingle;
-        private bool _useUpdateAll;
+        private bool _useUpdate;
         private bool _useDelete;
         private string _objectName;
         private string _tableName;
@@ -148,23 +147,13 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
             }
         }
 
-        public bool UseUpdateSingle
+        public bool UseUpdate
         {
-            get { return _useUpdateSingle; }
+            get { return _useUpdate; }
             set
             {
-                _useUpdateSingle = value;
-                OnPropertyChanged(nameof(UseUpdateSingle));
-            }
-        }
-
-        public bool UseUpdateAll
-        {
-            get { return _useUpdateAll; }
-            set
-            {
-                _useUpdateAll = value;
-                OnPropertyChanged(nameof(UseUpdateAll));
+                _useUpdate = value;
+                OnPropertyChanged(nameof(UseUpdate));
             }
         }
 
@@ -252,8 +241,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
             UseSelectAll = bool.Parse(ConfigurationManager.AppSettings["DefaultUseSelectAll"]);
             UseSelectById = bool.Parse(ConfigurationManager.AppSettings["DefaultUseSelectById"]);
             UseInsert = bool.Parse(ConfigurationManager.AppSettings["DefaultUseInsert"]);
-            UseUpdateSingle = bool.Parse(ConfigurationManager.AppSettings["DefaultUseUpdateSingle"]);
-            UseUpdateAll = bool.Parse(ConfigurationManager.AppSettings["DefaultUseUpdateAll"]);
+            UseUpdate= bool.Parse(ConfigurationManager.AppSettings["DefaultUseUpdate"]);
             UseDelete = bool.Parse(ConfigurationManager.AppSettings["DefaultUseDelete"]);
         }
 
@@ -353,8 +341,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
                 dbi.UseSelectAll = UseSelectAll;
                 dbi.UseSelectById = UseSelectById;
                 dbi.UseInsert = UseInsert;
-                dbi.UseUpdateSingle = UseUpdateSingle;
-                dbi.UseUpdateAll = UseUpdateAll;
+                dbi.UseUpdate= UseUpdate;
                 dbi.UseDelete = UseDelete;
 
                 DbItemList.Add(dbi);

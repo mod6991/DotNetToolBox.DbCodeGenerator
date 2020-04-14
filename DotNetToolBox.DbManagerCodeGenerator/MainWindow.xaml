@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DotNetToolBox.DbManagerCodeGenerator"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="740" Width="600">
+        Title="{Binding Title}" Height="710" Width="600">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
@@ -72,7 +72,6 @@
                             <RowDefinition Height="25" />
                             <RowDefinition Height="25" />
                             <RowDefinition Height="25" />
-                            <RowDefinition Height="25" />
                             <RowDefinition Height="100" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
@@ -90,12 +89,11 @@
                         <CheckBox Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseSelectAll}" Content="Select all" />
                         <CheckBox Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseSelectById}" Content="Select by id" />
                         <CheckBox Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseInsert}" Content="Insert" />
-                        <CheckBox Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseUpdateSingle}" Content="Update single" />
-                        <CheckBox Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseUpdateAll}" Content="Update all" />
-                        <CheckBox Grid.Row="8" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseDelete}" Content="Delete" />
-                        <Button Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" Content="Add" Command="{Binding AddObjectTableCommand}" />
-                        <Button Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" Content="Remove" Command="{Binding RemoveObjectTableCommand}" />
-                        <DataGrid Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Margin="4" AutoGenerateColumns="False" IsReadOnly="True"
+                        <CheckBox Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseUpdate}" Content="Update" />
+                        <CheckBox Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseDelete}" Content="Delete" />
+                        <Button Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" Content="Add" Command="{Binding AddObjectTableCommand}" />
+                        <Button Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" Content="Remove" Command="{Binding RemoveObjectTableCommand}" />
+                        <DataGrid Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="4" AutoGenerateColumns="False" IsReadOnly="True"
                                   ItemsSource="{Binding DbItemList}" SelectedItem="{Binding SelectedDbItem}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Object name" Width="140" Binding="{Binding ObjectName}" />
