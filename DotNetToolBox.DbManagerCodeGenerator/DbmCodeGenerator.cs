@@ -61,9 +61,9 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                 {
                     using (StreamWriter sw = new StreamWriter(fs, _encoding))
                     {
+                        sw.WriteLine("using DotNetToolBox.Database;");
                         sw.WriteLine("using System;");
                         sw.WriteLine("using System.Collections.Generic;");
-                        sw.WriteLine("using DotNetToolBox.Database;");
                         sw.WriteLine();
                         sw.WriteLine($"namespace {_objectsNamespace}");
                         sw.WriteLine("{"); //start namespace
@@ -170,14 +170,14 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                                 sw.WriteLine();
 
                             sw.WriteLine($"{WriteIndentCs(2)}public void Update{dbi.ObjectName}({dbi.ObjectName} {minObjName})");
-                            sw.WriteLine($"{WriteIndentCs(2)}{{"); //start Insert
+                            sw.WriteLine($"{WriteIndentCs(2)}{{"); //start Update
                             sw.WriteLine($"{WriteIndentCs(3)}List<DbParameter> parameters = new List<DbParameter>();");
 
                             foreach (DbField field in dbi.Fields)
                                 sw.WriteLine($"{WriteIndentCs(3)}parameters.Add(_db.CreateParameter(\"{field.ParameterName}\", {minObjName}.{field.PropertyName}));");
 
-                            sw.WriteLine($"{WriteIndentCs(3)}_db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Insert{dbi.ObjectName}\", parameters);");
-                            sw.WriteLine($"{WriteIndentCs(2)}}}"); //end Insert
+                            sw.WriteLine($"{WriteIndentCs(3)}_db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Update{dbi.ObjectName}\", parameters);");
+                            sw.WriteLine($"{WriteIndentCs(2)}}}"); //end Update
                             first = false;
                         }
 
@@ -186,7 +186,13 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                             if (!first)
                                 sw.WriteLine();
 
-
+                            sw.WriteLine($"{WriteIndentCs(2)}public void Delete{dbi.ObjectName}({dbi.Fields[0].DataType} {dbi.Fields[0].ParameterName})");
+                            sw.WriteLine($"{WriteIndentCs(2)}{{"); //start Delete
+                            sw.WriteLine($"{WriteIndentCs(3)}List<DbParameter> parameters = new List<DbParameter>();");
+                            sw.WriteLine($"{WriteIndentCs(3)}parameters.Add(_db.CreateParameter(\"{dbi.Fields[0].ParameterName}\", {dbi.Fields[0].ParameterName}));");
+                            sw.WriteLine($"{WriteIndentCs(3)}_db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Delete{dbi.ObjectName}\", parameters);");
+                            sw.WriteLine($"{WriteIndentCs(2)}}}"); //end Delete
+                            first = false;
                         }
 
                         sw.WriteLine($"{WriteIndentCs(1)}}}"); //end class
