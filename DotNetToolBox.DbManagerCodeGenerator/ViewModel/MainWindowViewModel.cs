@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data;
+using System.Text;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -238,7 +239,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
 
             _codeGenerationSettings = new CodeGenerationSettings
             {
-                CSharpFilesCodePage = ConfigurationManager.AppSettings["CSharpFilesCodePage"],
+                CSharpFilesCodePage = Int32.Parse(ConfigurationManager.AppSettings["CSharpFilesCodePage"]),
                 CSharpIndentType = ConfigurationManager.AppSettings["CSharpIndentType"],
                 CSharpIndentSize = Int32.Parse(ConfigurationManager.AppSettings["CSharpIndentSize"]),
                 SqlIndentType = ConfigurationManager.AppSettings["SqlIndentType"],
@@ -312,7 +313,10 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     DbmCodeGenerator dbm = new DbmCodeGenerator(DbItemList, _codeGenerationSettings, ObjectsNamespace, DbLayerNamespace, DbLayerObjectName, dialog.SelectedPath);
+                    dbm.Generate();
                 }
+
+                MessageBox.Show("Code generation succeeded !", "Done", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch(Exception ex)
             {

@@ -53,7 +53,43 @@ namespace DotNetToolBox.DbManagerCodeGenerator
             if (!Directory.Exists(objectsDir))
                 Directory.CreateDirectory(objectsDir);
 
+            foreach(DbItem dbi in _dbItems)
+            {
+                string file = Path.Combine(objectsDir, $"{dbi.ObjectName}.cs");
 
+                using(FileStream fs = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.Write))
+                {
+                    using (StreamWriter sw = new StreamWriter(fs, _encoding))
+                    {
+                        sw.WriteLine("using System;");
+                        sw.WriteLine("using System.Collections.Generic;");
+                        sw.WriteLine("using DotNetToolBox.Database;");
+                        sw.WriteLine();
+                        sw.WriteLine($"namespace {_objectsNamespace}");
+                        sw.WriteLine("{"); //start namespace
+                        sw.WriteLine($"{WriteIndentCs(1)}public class {dbi.ObjectName} : IDbObject");
+                        sw.WriteLine($"{WriteIndentCs(1)}{{"); //start class
+
+                        foreach(DbField field in dbi.Fields)
+                            sw.WriteLine($"{WriteIndentCs(2)}public {field.DataType} {field.PropertyName} {{ get; set; }}");
+
+                        sw.WriteLine();
+
+                        sw.WriteLine($"{WriteIndentCs(2)}public List<DbObjectMapping> GetMapping()");
+                        sw.WriteLine($"{WriteIndentCs(2)}{{"); //start GetMapping
+                        sw.WriteLine($"{WriteIndentCs(3)}List<DbObjectMapping> mapping = new List<DbObjectMapping>();");
+
+                        foreach(DbField field in dbi.Fields)
+                            sw.WriteLine($"{WriteIndentCs(3)}mapping.Add(new DbObjectMapping(\"{field.PropertyName}\",\"{field.DbFieldName}\"));");
+
+                        sw.WriteLine($"{WriteIndentCs(3)}return mapping;");
+                        sw.WriteLine($"{WriteIndentCs(2)}}}"); //end GetMapping
+
+                        sw.WriteLine($"{WriteIndentCs(1)}}}"); //end class
+                        sw.WriteLine("}"); //end namespace
+                    }
+                }
+            }
         }
 
         private void GenerateDbLayerHome()
@@ -68,9 +104,14 @@ namespace DotNetToolBox.DbManagerCodeGenerator
 
         private void GenerateQueries()
         {
-            string queriesDir = Path.Combine(_outputPath, "Queries");
-            if (!Directory.Exists(queriesDir))
-                Directory.CreateDirectory(queriesDir);
+            //string queriesDir = Path.Combine(_outputPath, "Queries");
+            //if (!Directory.Exists(queriesDir))
+            //    Directory.CreateDirectory(queriesDir);
+        }
+
+        private string WriteIndentCs(int nbIndent)
+        {
+            return new string(_codeGenerationSettings.CSharpIndentType == "SPACES" ? ' ' : '\t', _codeGenerationSettings.CSharpIndentSize * nbIndent);
         }
     }
 }
