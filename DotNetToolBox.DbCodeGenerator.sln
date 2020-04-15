@@ -5,10 +5,6 @@ VisualStudioVersion = 16.0.29911.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetToolBox.DbManagerCodeGenerator", "DotNetToolBox.DbManagerCodeGenerator\DotNetToolBox.DbManagerCodeGenerator.csproj", "{542FD256-9A37-4325-AD89-9B492780AB9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetToolBox.DbCodeGenerator", "DotNetToolBox.DbCodeGenerator\DotNetToolBox.DbCodeGenerator.csproj", "{3440A9CB-E5CB-474F-A23E-10D76AF4D288}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetToolBox.DbCodeGenerator.Core", "DotNetToolBox.DbCodeGenerator.Core\DotNetToolBox.DbCodeGenerator.Core.csproj", "{03CD7E51-757F-4FC1-A3AC-957643EC1C21}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -25,22 +21,6 @@ Global
 		{542FD256-9A37-4325-AD89-9B492780AB9C}.Release|x64.Build.0 = Release|x64
 		{542FD256-9A37-4325-AD89-9B492780AB9C}.Release|x86.ActiveCfg = Release|x86
 		{542FD256-9A37-4325-AD89-9B492780AB9C}.Release|x86.Build.0 = Release|x86
-		{3440A9CB-E5CB-474F-A23E-10D76AF4D288}.Debug|x64.ActiveCfg = Debug|x64
-		{3440A9CB-E5CB-474F-A23E-10D76AF4D288}.Debug|x64.Build.0 = Debug|x64
-		{3440A9CB-E5CB-474F-A23E-10D76AF4D288}.Debug|x86.ActiveCfg = Debug|x86
-		{3440A9CB-E5CB-474F-A23E-10D76AF4D288}.Debug|x86.Build.0 = Debug|x86
-		{3440A9CB-E5CB-474F-A23E-10D76AF4D288}.Release|x64.ActiveCfg = Release|x64
-		{3440A9CB-E5CB-474F-A23E-10D76AF4D288}.Release|x64.Build.0 = Release|x64
-		{3440A9CB-E5CB-474F-A23E-10D76AF4D288}.Release|x86.ActiveCfg = Release|x86
-		{3440A9CB-E5CB-474F-A23E-10D76AF4D288}.Release|x86.Build.0 = Release|x86
-		{03CD7E51-757F-4FC1-A3AC-957643EC1C21}.Debug|x64.ActiveCfg = Debug|x64
-		{03CD7E51-757F-4FC1-A3AC-957643EC1C21}.Debug|x64.Build.0 = Debug|x64
-		{03CD7E51-757F-4FC1-A3AC-957643EC1C21}.Debug|x86.ActiveCfg = Debug|x86
-		{03CD7E51-757F-4FC1-A3AC-957643EC1C21}.Debug|x86.Build.0 = Debug|x86
-		{03CD7E51-757F-4FC1-A3AC-957643EC1C21}.Release|x64.ActiveCfg = Release|x64
-		{03CD7E51-757F-4FC1-A3AC-957643EC1C21}.Release|x64.Build.0 = Release|x64
-		{03CD7E51-757F-4FC1-A3AC-957643EC1C21}.Release|x86.ActiveCfg = Release|x86
-		{03CD7E51-757F-4FC1-A3AC-957643EC1C21}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

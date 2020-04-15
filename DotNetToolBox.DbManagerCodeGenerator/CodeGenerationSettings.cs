@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotNetToolBox.DbCodeGenerator.Core
+namespace DotNetToolBox.DbManagerCodeGenerator
 {
     public class CodeGenerationSettings
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotNetToolBox.DbCodeGenerator.Core
+namespace DotNetToolBox.DbManagerCodeGenerator
 {
     public class DbItem
     {

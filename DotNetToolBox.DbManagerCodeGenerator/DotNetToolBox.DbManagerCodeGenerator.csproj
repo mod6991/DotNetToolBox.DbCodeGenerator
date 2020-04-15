@@ -114,6 +114,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CodeGenerationSettings.cs" />
+    <Compile Include="DbField.cs" />
+    <Compile Include="DbItem.cs" />
     <Compile Include="DbmCodeGenerator.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\PasswordWindowViewModel.cs" />
@@ -162,12 +165,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DotNetToolBox.DbCodeGenerator.Core\DotNetToolBox.DbCodeGenerator.Core.csproj">
-      <Project>{03cd7e51-757f-4fc1-a3ac-957643ec1c21}</Project>
-      <Name>DotNetToolBox.DbCodeGenerator.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

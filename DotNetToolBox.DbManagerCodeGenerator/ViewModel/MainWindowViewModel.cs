@@ -1,14 +1,10 @@
 ﻿using DotNetToolBox.Database;
-using DotNetToolBox.DbCodeGenerator.Core;
 using DotNetToolBox.MVVM;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data;
-using System.Text;
 using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
