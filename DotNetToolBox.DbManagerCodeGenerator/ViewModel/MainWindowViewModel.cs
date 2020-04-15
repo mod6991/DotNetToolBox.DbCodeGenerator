@@ -32,11 +32,12 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
         public MainWindowViewModel(Window window)
             : base(window)
         {
-            ResetCommand                = new RelayCommand((param) => Reset(),              (param) => ReturnTrue());
-            GenerateCommand             = new RelayCommand((param) => Generate(),           (param) => ReturnTrue());
-            ExitCommand                 = new RelayCommand((param) => Exit(),               (param) => ReturnTrue());
-            AddObjectTableCommand       = new RelayCommand((param) => AddObjectTable(),     (param) => ReturnTrue());
-            RemoveObjectTableCommand    = new RelayCommand((param) => RemoveObjectTable(),  (param) => ReturnTrue());
+            ResetCommand                        = new RelayCommand((param) => Reset(),              (param) => ReturnTrue());
+            GenerateCommand                     = new RelayCommand((param) => Generate(true),       (param) => ReturnTrue());
+            GenerateWithoutReflectionCommand    = new RelayCommand((param) => Generate(false),      (param) => ReturnTrue());
+            ExitCommand                         = new RelayCommand((param) => Exit(),               (param) => ReturnTrue());
+            AddObjectTableCommand               = new RelayCommand((param) => AddObjectTable(),     (param) => ReturnTrue());
+            RemoveObjectTableCommand            = new RelayCommand((param) => RemoveObjectTable(),  (param) => ReturnTrue());
 
             DbItemList = new ObservableCollection<DbItem>();
 
@@ -208,6 +209,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
 
         public ICommand ResetCommand { get; }
         public ICommand GenerateCommand { get; }
+        public ICommand GenerateWithoutReflectionCommand { get; }
         public ICommand ExitCommand { get; }
         public ICommand AddObjectTableCommand { get; }
         public ICommand RemoveObjectTableCommand { get; }
@@ -259,7 +261,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
             }
         }
 
-        private void Generate()
+        private void Generate(bool useReflection)
         {
             DbManager db = null;
 
@@ -297,7 +299,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     DbmCodeGenerator dbm = new DbmCodeGenerator(DbItemList, _codeGenerationSettings, ObjectsNamespace, DbLayerNamespace, DbLayerObjectName, ParameterPrefix, dialog.SelectedPath);
-                    dbm.Generate();
+                    dbm.Generate(useReflection);
                 }
 
                 MessageBox.Show("Code generation succeeded !", "Done", MessageBoxButton.OK, MessageBoxImage.Information);

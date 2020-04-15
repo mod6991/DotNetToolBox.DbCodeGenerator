@@ -11,7 +11,9 @@
             <MenuItem Header="File">
                 <MenuItem.Items>
                     <MenuItem Header="Reset" Command="{Binding ResetCommand}" />
+                    <Separator />
                     <MenuItem Header="Generate" Command="{Binding GenerateCommand}" />
+                    <MenuItem Header="Generate without reflection" Command="{Binding GenerateWithoutReflectionCommand}" IsEnabled="False" />
                     <Separator />
                     <MenuItem Header="Exit" Command="{Binding ExitCommand}" />
                 </MenuItem.Items>

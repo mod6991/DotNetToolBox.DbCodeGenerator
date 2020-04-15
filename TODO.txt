@@ -1,0 +1,10 @@
+TODO list:
+----------
+ - Use DotNetToolBox 7.2 (for DataReader generation)
+ - Add app title
+ - Change datagrid (add bool columns, IsReadOnly=false)
+ - Add save/load DbItems in xml file
+ - Add about window (access it from menuitem help)
+ - Generate DataReaderCode
+ - add license
+ - 

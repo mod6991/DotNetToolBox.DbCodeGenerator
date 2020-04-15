@@ -38,11 +38,20 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                 throw new NotSupportedException($"SqlIndentSize cannot be negative");
         }
 
-        public void Generate()
+        public void Generate(bool useReflection)
         {
             GenerateObjects();
-            GenerateDbLayerHome();
-            GenerateDbLayerItems();
+            
+            if (useReflection)
+            {
+                GenerateDbLayerHome();
+                GenerateDbLayerItems();
+            }
+            else
+            {
+
+            }
+
             GenerateQueries();
         }
 
