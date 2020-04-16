@@ -289,6 +289,8 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
                     DataTable dt = new DataTable();
                     db.FillDataTableWithRequest(dbi.Query, null, dt);
 
+                    dbi.Fields.Clear();
+
                     foreach (DataColumn col in dt.Columns)
                         dbi.Fields.Add(new DbField(col.DataType.Name, col.ColumnName));
                 }
