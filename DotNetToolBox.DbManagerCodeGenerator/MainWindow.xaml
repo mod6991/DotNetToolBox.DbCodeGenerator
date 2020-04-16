@@ -5,12 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DotNetToolBox.DbManagerCodeGenerator"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="710" Width="600">
+        Title="{Binding Title}" Height="750" Width="630">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
                 <MenuItem.Items>
                     <MenuItem Header="Reset" Command="{Binding ResetCommand}" />
+                    <Separator />
+                    <MenuItem Header="Save" Command="{Binding SaveCommand}" />
+                    <MenuItem Header="Load" Command="{Binding LoadCommand}" />
                     <Separator />
                     <MenuItem Header="Generate" Command="{Binding GenerateCommand}" />
                     <MenuItem Header="Generate without reflection" Command="{Binding GenerateWithoutReflectionCommand}" IsEnabled="False" />
@@ -74,7 +77,7 @@
                             <RowDefinition Height="25" />
                             <RowDefinition Height="25" />
                             <RowDefinition Height="25" />
-                            <RowDefinition Height="100" />
+                            <RowDefinition Height="150" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="130" />
@@ -95,12 +98,17 @@
                         <CheckBox Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" Margin="4 0 4 0" IsChecked="{Binding UseDelete}" Content="Delete" />
                         <Button Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" Content="Add" Command="{Binding AddObjectTableCommand}" />
                         <Button Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="4 0 4 0" Content="Remove" Command="{Binding RemoveObjectTableCommand}" />
-                        <DataGrid Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="4" AutoGenerateColumns="False" IsReadOnly="True"
+                        <DataGrid Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="4" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
                                   ItemsSource="{Binding DbItemList}" SelectedItem="{Binding SelectedDbItem}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Object name" Width="140" Binding="{Binding ObjectName}" />
                                 <DataGridTextColumn Header="Table name" Width="140" Binding="{Binding TableName}" />
-                                <DataGridTextColumn Header="Query" Width="200" Binding="{Binding Query}" />
+                                <DataGridCheckBoxColumn Header="Select" Width="50" Binding="{Binding UseSelectAll}" />
+                                <DataGridCheckBoxColumn Header="SelectById" Width="70" Binding="{Binding UseSelectById}" />
+                                <DataGridCheckBoxColumn Header="Insert" Width="50" Binding="{Binding UseInsert}" />
+                                <DataGridCheckBoxColumn Header="Update" Width="50" Binding="{Binding UseUpdate}" />
+                                <DataGridCheckBoxColumn Header="Delete" Width="50" Binding="{Binding UseDelete}" />
+                                <!--<DataGridTextColumn Header="Query" Width="200" Binding="{Binding Query}" />-->
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>

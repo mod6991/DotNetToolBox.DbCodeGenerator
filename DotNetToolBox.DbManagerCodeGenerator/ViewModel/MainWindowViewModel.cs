@@ -1,11 +1,14 @@
 ﻿using DotNetToolBox.Database;
 using DotNetToolBox.MVVM;
+using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
+using System.Xml;
 
 namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
 {
@@ -33,6 +36,8 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
             : base(window)
         {
             ResetCommand                        = new RelayCommand((param) => Reset(),              (param) => ReturnTrue());
+            SaveCommand                         = new RelayCommand((param) => Save(),               (param) => ReturnTrue());
+            LoadCommand                         = new RelayCommand((param) => Load(),               (param) => ReturnTrue());
             GenerateCommand                     = new RelayCommand((param) => Generate(true),       (param) => ReturnTrue());
             GenerateWithoutReflectionCommand    = new RelayCommand((param) => Generate(false),      (param) => ReturnTrue());
             ExitCommand                         = new RelayCommand((param) => Exit(),               (param) => ReturnTrue());
@@ -208,6 +213,8 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
 
 
         public ICommand ResetCommand { get; }
+        public ICommand SaveCommand { get; }
+        public ICommand LoadCommand { get; }
         public ICommand GenerateCommand { get; }
         public ICommand GenerateWithoutReflectionCommand { get; }
         public ICommand ExitCommand { get; }
@@ -254,6 +261,114 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
             {
                 LoadAppSettings();
                 DbItemList.Clear();
+                ObjectName = string.Empty;
+                TableName = string.Empty;
+                Query = string.Empty;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void Save()
+        {
+            try
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Title = "Save";
+                sfd.Filter = "XML files (*.xml)|*.xml";
+
+                bool? sdr = sfd.ShowDialog();
+                if (!sdr.Value)
+                    return;
+
+                using (XmlTextWriter xml = new XmlTextWriter(sfd.FileName, Encoding.UTF8))
+                {
+                    xml.Formatting = Formatting.Indented;
+                    xml.WriteStartDocument();
+
+                    xml.WriteStartElement("Objects");
+
+                    foreach(DbItem dbi in DbItemList)
+                    {
+                        xml.WriteStartElement("Object");
+                        xml.WriteAttributeString(nameof(UseSelectAll), dbi.UseSelectAll.ToString());
+                        xml.WriteAttributeString(nameof(UseSelectById), dbi.UseSelectById.ToString());
+                        xml.WriteAttributeString(nameof(UseInsert), dbi.UseInsert.ToString());
+                        xml.WriteAttributeString(nameof(UseUpdate), dbi.UseUpdate.ToString());
+                        xml.WriteAttributeString(nameof(UseDelete), dbi.UseDelete.ToString());
+
+                        xml.WriteStartElement(nameof(ObjectName));
+                        xml.WriteString(dbi.ObjectName);
+                        xml.WriteEndElement();
+
+                        xml.WriteStartElement(nameof(TableName));
+                        xml.WriteString(dbi.TableName);
+                        xml.WriteEndElement();
+
+                        xml.WriteStartElement(nameof(Query));
+                        xml.WriteString(dbi.Query);
+                        xml.WriteEndElement();
+
+                        xml.WriteEndElement(); //end Object
+                    }
+
+                    xml.WriteEndElement(); //end Objects
+
+                    xml.WriteEndDocument();
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void Load()
+        {
+            try
+            {
+                OpenFileDialog ofd = new OpenFileDialog();
+                ofd.Title = "Load";
+                ofd.Multiselect = false;
+                ofd.Filter = "XML files (*.xml)|*.xml";
+
+                bool? sdr = ofd.ShowDialog();
+                if (!sdr.Value)
+                    return;
+
+                DbItemList.Clear();
+
+                XmlDocument doc = new XmlDocument();
+                doc.Load(ofd.FileName);
+
+                XmlNodeList objectList = doc.SelectNodes("/Objects/Object");
+
+                foreach(XmlNode objNode in objectList)
+                {
+                    XmlAttribute attrUseSelectAll = objNode.Attributes[nameof(UseSelectAll)];
+                    XmlAttribute attrUseSelectById = objNode.Attributes[nameof(UseSelectById)];
+                    XmlAttribute attrUseInsert = objNode.Attributes[nameof(UseInsert)];
+                    XmlAttribute attrUseUpdate = objNode.Attributes[nameof(UseUpdate)];
+                    XmlAttribute attrUseDelete = objNode.Attributes[nameof(UseDelete)];
+
+                    XmlNode objectNameNode = objNode.SelectSingleNode(nameof(ObjectName));
+                    XmlNode tableNameNode = objNode.SelectSingleNode(nameof(TableName));
+                    XmlNode queryNode = objNode.SelectSingleNode(nameof(Query));
+
+                    DbItem dbi = new DbItem();
+                    dbi.ObjectName = objectNameNode.InnerText;
+                    dbi.TableName = tableNameNode.InnerText;
+                    dbi.Query = queryNode.InnerText;
+                    dbi.UseSelectAll = bool.Parse(attrUseSelectAll.Value);
+                    dbi.UseSelectById = bool.Parse(attrUseSelectById.Value);
+                    dbi.UseInsert = bool.Parse(attrUseInsert.Value);
+                    dbi.UseUpdate= bool.Parse(attrUseUpdate.Value);
+                    dbi.UseDelete = bool.Parse(attrUseDelete.Value);
+
+                    DbItemList.Add(dbi);
+                }
             }
             catch(Exception ex)
             {
