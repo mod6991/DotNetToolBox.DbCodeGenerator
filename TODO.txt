@@ -1,5 +1,7 @@
 TODO list:
 ----------
+ - Change return Mapping in objects
+ - Reset not cleaning all fields (to fix)
  - Use DotNetToolBox 7.2 (for DataReader generation)
  - Add app title
  - Change datagrid (add bool columns, IsReadOnly=false)

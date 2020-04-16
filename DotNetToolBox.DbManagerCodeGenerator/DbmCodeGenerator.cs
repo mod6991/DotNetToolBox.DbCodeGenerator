@@ -85,12 +85,18 @@ namespace DotNetToolBox.DbManagerCodeGenerator
 
                         sw.WriteLine($"{WriteIndentCs(2)}public List<DbObjectMapping> GetMapping()");
                         sw.WriteLine($"{WriteIndentCs(2)}{{"); //start GetMapping
-                        sw.WriteLine($"{WriteIndentCs(3)}List<DbObjectMapping> mapping = new List<DbObjectMapping>();");
+                        sw.WriteLine($"{WriteIndentCs(3)}return new List<DbObjectMapping>");
+                        sw.WriteLine($"{WriteIndentCs(3)}{{");
 
-                        foreach(DbField field in dbi.Fields)
-                            sw.WriteLine($"{WriteIndentCs(3)}mapping.Add(new DbObjectMapping(\"{field.PropertyName}\",\"{field.DbFieldName}\"));");
+                        for(int i=0,l=dbi.Fields.Count; i < l; i++)
+                        {
+                            if(i < l - 1)
+                                sw.WriteLine($"{WriteIndentCs(4)}new DbObjectMapping(\"{dbi.Fields[i].PropertyName}\", \"{dbi.Fields[i].DbFieldName}\"),");
+                            else
+                                sw.WriteLine($"{WriteIndentCs(4)}new DbObjectMapping(\"{dbi.Fields[i].PropertyName}\", \"{dbi.Fields[i].DbFieldName}\")");
+                        }
 
-                        sw.WriteLine($"{WriteIndentCs(3)}return mapping;");
+                        sw.WriteLine($"{WriteIndentCs(3)}}};");
                         sw.WriteLine($"{WriteIndentCs(2)}}}"); //end GetMapping
 
                         sw.WriteLine($"{WriteIndentCs(1)}}}"); //end class
