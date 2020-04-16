@@ -449,6 +449,12 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
         {
             try
             {
+                if(string.IsNullOrWhiteSpace(ObjectName) || string.IsNullOrWhiteSpace(TableName) || string.IsNullOrWhiteSpace(Query))
+                {
+                    MessageBox.Show("The fields 'ObjectName', 'TableName' and 'Query' must be filled !", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
                 DbItem dbi = new DbItem();
                 dbi.ObjectName = ObjectName;
                 dbi.TableName = TableName;
