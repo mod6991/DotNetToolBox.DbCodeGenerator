@@ -16,7 +16,7 @@
                     <MenuItem Header="Load" Command="{Binding LoadCommand}" />
                     <Separator />
                     <MenuItem Header="Generate" Command="{Binding GenerateCommand}" />
-                    <MenuItem Header="Generate without reflection" Command="{Binding GenerateWithoutReflectionCommand}" IsEnabled="False" />
+                    <MenuItem Header="Generate without reflection" Command="{Binding GenerateWithoutReflectionCommand}" />
                     <Separator />
                     <MenuItem Header="Exit" Command="{Binding ExitCommand}" />
                 </MenuItem.Items>
