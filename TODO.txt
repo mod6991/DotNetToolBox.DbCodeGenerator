@@ -6,8 +6,9 @@ TODO list:
  - [DONE] Add app title
  - [DONE] Change datagrid (add bool columns, IsReadOnly=false)
  - [DONE] Add save/load DbItems in xml file
+ - [DONE] Generate DataReaderCode
+ - Separate code from DbManager -> new DbLayerHome
  - Add about window (access it from menuitem help)
  - Add icon
- - Generate DataReaderCode
  - add license
  - 
