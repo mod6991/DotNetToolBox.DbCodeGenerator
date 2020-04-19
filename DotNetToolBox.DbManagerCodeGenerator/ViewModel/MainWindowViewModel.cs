@@ -1,10 +1,12 @@
 ﻿using DotNetToolBox.Database;
 using DotNetToolBox.MVVM;
+using DotNetToolBox.Utils;
 using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
@@ -35,6 +37,9 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
         public MainWindowViewModel(Window window)
             : base(window)
         {
+            string version = AssemblyHelper.GetVersion(Assembly.GetAssembly(typeof(App)));
+            Title = "DotNetToolBox.DbManagerCodeGenerator " + version.Replace(".0.0", "");
+
             ResetCommand                        = new RelayCommand((param) => Reset(),              (param) => ReturnTrue());
             SaveCommand                         = new RelayCommand((param) => Save(),               (param) => ReturnTrue());
             LoadCommand                         = new RelayCommand((param) => Load(),               (param) => ReturnTrue());

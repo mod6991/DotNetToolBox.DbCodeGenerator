@@ -2,11 +2,12 @@ TODO list:
 ----------
  - [DONE] Change return Mapping in objects
  - [DONE] Reset not cleaning all fields (to fix)
- - Use DotNetToolBox 7.2 (for DataReader generation)
- - Add app title
+ - [DONE] Use DotNetToolBox 7.2 (for DataReader generation)
+ - [DONE] Add app title
  - [DONE] Change datagrid (add bool columns, IsReadOnly=false)
  - [DONE] Add save/load DbItems in xml file
  - Add about window (access it from menuitem help)
+ - Add icon
  - Generate DataReaderCode
  - add license
  - 
