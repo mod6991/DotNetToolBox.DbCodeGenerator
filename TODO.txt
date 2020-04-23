@@ -7,7 +7,8 @@ TODO list:
  - [DONE] Change datagrid (add bool columns, IsReadOnly=false)
  - [DONE] Add save/load DbItems in xml file
  - [DONE] Generate DataReaderCode
- - Separate code from DbManager -> new DbLayerHome
+ - [DONE] Separate code from DbManager -> new DbLayerHome
+ - Remove indent type/size -> useless
  - Add about window (access it from menuitem help)
  - Add icon
  - add license
