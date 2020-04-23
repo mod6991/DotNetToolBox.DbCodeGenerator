@@ -555,10 +555,10 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                         if (dbi.UseSelectAll)
                         {
                             sw.WriteLine($"        public List<{dbi.ObjectName}> SelectAll{dbi.ObjectName}s()");
-                            sw.WriteLine($"        {{"); //start SelectAll
+                            sw.WriteLine($"        {{");
                             sw.WriteLine($"            List<{dbi.ObjectName}> list = _db[\"{dbi.ObjectName}\"].FillObjects<{dbi.ObjectName}>(\"SelectAll{dbi.ObjectName}s\", null);");
                             sw.WriteLine($"            return list;");
-                            sw.WriteLine($"        }}"); //end SelectAll
+                            sw.WriteLine($"        }}");
                             first = false;
                         }
 
@@ -568,14 +568,14 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                                 sw.WriteLine();
 
                             sw.WriteLine($"        public {dbi.ObjectName} Select{dbi.ObjectName}ById({dbi.Fields[0].DataType} {dbi.Fields[0].ParameterName})");
-                            sw.WriteLine($"        {{"); //start SelectById
+                            sw.WriteLine($"        {{");
                             sw.WriteLine($"            List<DbParameter> parameters = new List<DbParameter>();");
                             sw.WriteLine($"            parameters.Add(_db.CreateParameter(\"{dbi.Fields[0].ParameterName}\", {dbi.Fields[0].ParameterName}));");
                             sw.WriteLine($"            List<{dbi.ObjectName}> list = _db[\"{dbi.ObjectName}\"].FillObjects<{dbi.ObjectName}>(\"Select{dbi.ObjectName}ById\", parameters);");
                             sw.WriteLine($"            if (list.Count == 0)");
                             sw.WriteLine($"                return null;");
                             sw.WriteLine($"            return list[0];");
-                            sw.WriteLine($"        }}"); //end SelectById
+                            sw.WriteLine($"        }}");
                             first = false;
                         }
 
@@ -585,14 +585,14 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                                 sw.WriteLine();
 
                             sw.WriteLine($"        public void Insert{dbi.ObjectName}({dbi.ObjectName} {minObjName})");
-                            sw.WriteLine($"        {{"); //start Insert
+                            sw.WriteLine($"        {{");
                             sw.WriteLine($"            List<DbParameter> parameters = new List<DbParameter>();");
 
                             foreach (DbField field in dbi.Fields)
                                 sw.WriteLine($"            parameters.Add(_db.CreateParameter(\"{field.ParameterName}\", {minObjName}.{field.PropertyName}));");
 
                             sw.WriteLine($"            _db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Insert{dbi.ObjectName}\", parameters);");
-                            sw.WriteLine($"        }}"); //end Insert
+                            sw.WriteLine($"        }}");
                             first = false;
                         }
 
@@ -602,14 +602,14 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                                 sw.WriteLine();
 
                             sw.WriteLine($"        public void Update{dbi.ObjectName}({dbi.ObjectName} {minObjName})");
-                            sw.WriteLine($"        {{"); //start Update
+                            sw.WriteLine($"        {{");
                             sw.WriteLine($"            List<DbParameter> parameters = new List<DbParameter>();");
 
                             foreach (DbField field in dbi.Fields)
                                 sw.WriteLine($"            parameters.Add(_db.CreateParameter(\"{field.ParameterName}\", {minObjName}.{field.PropertyName}));");
 
                             sw.WriteLine($"            _db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Update{dbi.ObjectName}\", parameters);");
-                            sw.WriteLine($"        }}"); //end Update
+                            sw.WriteLine($"        }}");
                             first = false;
                         }
 
@@ -619,11 +619,11 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                                 sw.WriteLine();
 
                             sw.WriteLine($"        public void Delete{dbi.ObjectName}({dbi.Fields[0].DataType} {dbi.Fields[0].ParameterName})");
-                            sw.WriteLine($"        {{"); //start Delete
+                            sw.WriteLine($"        {{");
                             sw.WriteLine($"            List<DbParameter> parameters = new List<DbParameter>();");
                             sw.WriteLine($"            parameters.Add(_db.CreateParameter(\"{dbi.Fields[0].ParameterName}\", {dbi.Fields[0].ParameterName}));");
                             sw.WriteLine($"            _db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Delete{dbi.ObjectName}\", parameters);");
-                            sw.WriteLine($"        }}"); //end Delete
+                            sw.WriteLine($"        }}");
                             first = false;
                         }
 
