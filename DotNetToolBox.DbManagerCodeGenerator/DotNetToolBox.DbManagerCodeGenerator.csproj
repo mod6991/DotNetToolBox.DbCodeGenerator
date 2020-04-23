@@ -114,7 +114,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="CodeGenerationSettings.cs" />
     <Compile Include="DbField.cs" />
     <Compile Include="DbItem.cs" />
     <Compile Include="DbmCodeGenerator.cs" />

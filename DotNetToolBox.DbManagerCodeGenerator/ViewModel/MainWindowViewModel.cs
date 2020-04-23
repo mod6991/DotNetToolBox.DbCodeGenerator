@@ -32,7 +32,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
         private string _tableName;
         private string _query;
         private DbItem _selectedDbItem;
-        private CodeGenerationSettings _codeGenerationSettings;
+        private int _csharpFilesCodePage;
 
         public MainWindowViewModel(Window window)
             : base(window)
@@ -234,16 +234,8 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
             ObjectsNamespace = ConfigurationManager.AppSettings["DefaultObjectsNamespace"];
             DbLayerNamespace = ConfigurationManager.AppSettings["DefaultDbLayerNamespace"];
             DbLayerObjectName = ConfigurationManager.AppSettings["DefaultDbLayerObjectName"];
+            _csharpFilesCodePage = Int32.Parse(ConfigurationManager.AppSettings["CSharpFilesCodePage"]);
             LoadObjectSpecificSettings();
-
-            _codeGenerationSettings = new CodeGenerationSettings
-            {
-                CSharpFilesCodePage = Int32.Parse(ConfigurationManager.AppSettings["CSharpFilesCodePage"]),
-                CSharpIndentType = ConfigurationManager.AppSettings["CSharpIndentType"],
-                CSharpIndentSize = Int32.Parse(ConfigurationManager.AppSettings["CSharpIndentSize"]),
-                SqlIndentType = ConfigurationManager.AppSettings["SqlIndentType"],
-                SqlIndentSize = Int32.Parse(ConfigurationManager.AppSettings["SqlIndentSize"])
-            };
         }
 
         private void LoadObjectSpecificSettings()
@@ -420,7 +412,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator.ViewModel
                 System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog();
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    DbmCodeGenerator dbm = new DbmCodeGenerator(DbItemList, _codeGenerationSettings, ObjectsNamespace, DbLayerNamespace, DbLayerObjectName, ParameterPrefix, dialog.SelectedPath);
+                    DbmCodeGenerator dbm = new DbmCodeGenerator(DbItemList, _csharpFilesCodePage, ObjectsNamespace, DbLayerNamespace, DbLayerObjectName, ParameterPrefix, dialog.SelectedPath);
                     dbm.Generate(useReflection);
                 }
 

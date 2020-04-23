@@ -9,7 +9,6 @@ namespace DotNetToolBox.DbManagerCodeGenerator
     public class DbmCodeGenerator
     {
         private IEnumerable<DbItem> _dbItems;
-        private CodeGenerationSettings _codeGenerationSettings;
         private string _objectsNamespace;
         private string _dbLayerNamespace;
         private string _dbLayerObjectName;
@@ -17,25 +16,15 @@ namespace DotNetToolBox.DbManagerCodeGenerator
         private Encoding _encoding;
         private string _outputPath;
 
-        public DbmCodeGenerator(IEnumerable<DbItem> dbItems, CodeGenerationSettings codeGenerationSettings, string objectsNamespace, string dbLayerNamespace, string dbLayerObjectName, string parameterPrefix, string outputPath)
+        public DbmCodeGenerator(IEnumerable<DbItem> dbItems, int csharpFilesCodePage, string objectsNamespace, string dbLayerNamespace, string dbLayerObjectName, string parameterPrefix, string outputPath)
         {
             _dbItems = dbItems;
-            _codeGenerationSettings = codeGenerationSettings;
             _objectsNamespace = objectsNamespace;
             _dbLayerNamespace = dbLayerNamespace;
             _dbLayerObjectName = dbLayerObjectName;
             _parameterPrefix = parameterPrefix;
             _outputPath = outputPath;
-            _encoding = Encoding.GetEncoding(_codeGenerationSettings.CSharpFilesCodePage);
-            
-            if (_codeGenerationSettings.CSharpIndentType != "SPACES" && _codeGenerationSettings.CSharpIndentType != "TABS")
-                throw new NotSupportedException($"CSharpIndentType '{_codeGenerationSettings.CSharpIndentType}' not supported");
-            if (_codeGenerationSettings.CSharpIndentSize < 0)
-                throw new NotSupportedException($"CSharpIndentSize cannot be negative");
-            if (_codeGenerationSettings.SqlIndentType != "SPACES" && _codeGenerationSettings.SqlIndentType != "TABS")
-                throw new NotSupportedException($"SqlIndentType '{_codeGenerationSettings.SqlIndentType}' not supported");
-            if (_codeGenerationSettings.SqlIndentSize < 0)
-                throw new NotSupportedException($"SqlIndentSize cannot be negative");
+            _encoding = Encoding.GetEncoding(csharpFilesCodePage);
         }
 
         public void Generate(bool useReflection)
@@ -76,31 +65,31 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                         sw.WriteLine();
                         sw.WriteLine($"namespace {_objectsNamespace}");
                         sw.WriteLine("{"); //start namespace
-                        sw.WriteLine($"{IndentCs(1)}public class {dbi.ObjectName} : IDbObject");
-                        sw.WriteLine($"{IndentCs(1)}{{"); //start class
+                        sw.WriteLine($"    public class {dbi.ObjectName} : IDbObject");
+                        sw.WriteLine($"    {{"); //start class
 
                         foreach(DbField field in dbi.Fields)
-                            sw.WriteLine($"{IndentCs(2)}public {field.DataType} {field.PropertyName} {{ get; set; }}");
+                            sw.WriteLine($"        public {field.DataType} {field.PropertyName} {{ get; set; }}");
 
                         sw.WriteLine();
 
-                        sw.WriteLine($"{IndentCs(2)}public List<DbObjectMapping> GetMapping()");
-                        sw.WriteLine($"{IndentCs(2)}{{"); //start GetMapping
-                        sw.WriteLine($"{IndentCs(3)}return new List<DbObjectMapping>");
-                        sw.WriteLine($"{IndentCs(3)}{{");
+                        sw.WriteLine($"        public List<DbObjectMapping> GetMapping()");
+                        sw.WriteLine($"        {{"); //start GetMapping
+                        sw.WriteLine($"            return new List<DbObjectMapping>");
+                        sw.WriteLine($"            {{");
 
                         for(int i=0,l=dbi.Fields.Count; i < l; i++)
                         {
                             if(i < l - 1)
-                                sw.WriteLine($"{IndentCs(4)}new DbObjectMapping(\"{dbi.Fields[i].PropertyName}\", \"{dbi.Fields[i].DbFieldName}\"),");
+                                sw.WriteLine($"                new DbObjectMapping(\"{dbi.Fields[i].PropertyName}\", \"{dbi.Fields[i].DbFieldName}\"),");
                             else
-                                sw.WriteLine($"{IndentCs(4)}new DbObjectMapping(\"{dbi.Fields[i].PropertyName}\", \"{dbi.Fields[i].DbFieldName}\")");
+                                sw.WriteLine($"                new DbObjectMapping(\"{dbi.Fields[i].PropertyName}\", \"{dbi.Fields[i].DbFieldName}\")");
                         }
 
-                        sw.WriteLine($"{IndentCs(3)}}};");
-                        sw.WriteLine($"{IndentCs(2)}}}"); //end GetMapping
+                        sw.WriteLine($"            }};");
+                        sw.WriteLine($"        }}"); //end GetMapping
 
-                        sw.WriteLine($"{IndentCs(1)}}}"); //end class
+                        sw.WriteLine($"    }}"); //end class
                         sw.WriteLine("}"); //end namespace
                     }
                 }
@@ -125,13 +114,13 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                         sw.WriteLine();
                         sw.WriteLine($"namespace {_objectsNamespace}");
                         sw.WriteLine("{"); //start namespace
-                        sw.WriteLine($"{IndentCs(1)}public class {dbi.ObjectName} : IDbObject");
-                        sw.WriteLine($"{IndentCs(1)}{{"); //start class
+                        sw.WriteLine($"    public class {dbi.ObjectName} : IDbObject");
+                        sw.WriteLine($"    {{"); //start class
 
                         foreach (DbField field in dbi.Fields)
-                            sw.WriteLine($"{IndentCs(2)}public {field.DataType} {field.PropertyName} {{ get; set; }}");
+                            sw.WriteLine($"        public {field.DataType} {field.PropertyName} {{ get; set; }}");
 
-                        sw.WriteLine($"{IndentCs(1)}}}"); //end class
+                        sw.WriteLine($"    }}"); //end class
                         sw.WriteLine("}"); //end namespace
                     }
                 }
@@ -157,46 +146,46 @@ namespace DotNetToolBox.DbManagerCodeGenerator
 
                         if (dbi.UseSelectAll)
                         {
-                            sw.WriteLine($"{IndentSql(1)}<Request Name=\"SelectAll{dbi.ObjectName}s\">");
-                            sw.WriteLine($"{IndentSql(2)}SELECT");
+                            sw.WriteLine($"  <Request Name=\"SelectAll{dbi.ObjectName}s\">");
+                            sw.WriteLine($"    SELECT");
 
                             for (int i = 0, l = dbi.Fields.Count; i < l; i++)
                             {
                                 if (i < l - 1)
-                                    sw.WriteLine($"{IndentSql(3)}{dbi.Fields[i].DbFieldName},");
+                                    sw.WriteLine($"      {dbi.Fields[i].DbFieldName},");
                                 else
-                                    sw.WriteLine($"{IndentSql(3)}{dbi.Fields[i].DbFieldName}");
+                                    sw.WriteLine($"      {dbi.Fields[i].DbFieldName}");
                             }
 
-                            sw.WriteLine($"{IndentSql(2)}FROM");
-                            sw.WriteLine($"{IndentSql(3)}{dbi.TableName}");
-                            sw.WriteLine($"{IndentSql(1)}</Request>");
+                            sw.WriteLine($"    FROM");
+                            sw.WriteLine($"      {dbi.TableName}");
+                            sw.WriteLine($"  </Request>");
                         }
 
                         if (dbi.UseSelectById)
                         {
-                            sw.WriteLine($"{IndentSql(1)}<Request Name=\"Select{dbi.ObjectName}ById\">");
-                            sw.WriteLine($"{IndentSql(2)}SELECT");
+                            sw.WriteLine($"  <Request Name=\"Select{dbi.ObjectName}ById\">");
+                            sw.WriteLine($"    SELECT");
 
                             for (int i = 0, l = dbi.Fields.Count; i < l; i++)
                             {
                                 if (i < l - 1)
-                                    sw.WriteLine($"{IndentSql(3)}{dbi.Fields[i].DbFieldName},");
+                                    sw.WriteLine($"      {dbi.Fields[i].DbFieldName},");
                                 else
-                                    sw.WriteLine($"{IndentSql(3)}{dbi.Fields[i].DbFieldName}");
+                                    sw.WriteLine($"      {dbi.Fields[i].DbFieldName}");
                             }
 
-                            sw.WriteLine($"{IndentSql(2)}FROM");
-                            sw.WriteLine($"{IndentSql(3)}{dbi.TableName}");
-                            sw.WriteLine($"{IndentSql(2)}WHERE");
-                            sw.WriteLine($"{IndentSql(3)}{dbi.Fields[0].DbFieldName} = {_parameterPrefix}{dbi.Fields[0].ParameterName}");
-                            sw.WriteLine($"{IndentSql(1)}</Request>");
+                            sw.WriteLine($"    FROM");
+                            sw.WriteLine($"      {dbi.TableName}");
+                            sw.WriteLine($"    WHERE");
+                            sw.WriteLine($"      {dbi.Fields[0].DbFieldName} = {_parameterPrefix}{dbi.Fields[0].ParameterName}");
+                            sw.WriteLine($"  </Request>");
                         }
 
                         if (dbi.UseInsert)
                         {
-                            sw.WriteLine($"{IndentSql(1)}<Request Name=\"Insert{dbi.ObjectName}\">");
-                            sw.Write($"{IndentSql(2)}INSERT INTO {dbi.TableName} (");
+                            sw.WriteLine($"  <Request Name=\"Insert{dbi.ObjectName}\">");
+                            sw.Write($"    INSERT INTO {dbi.TableName} (");
 
                             for (int i = 0, l = dbi.Fields.Count; i < l; i++)
                             {
@@ -206,7 +195,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                                     sw.WriteLine($"{dbi.Fields[i].DbFieldName})");
                             }
 
-                            sw.Write($"{IndentSql(2)}VALUES (");
+                            sw.Write($"    VALUES (");
 
                             for (int i = 0, l = dbi.Fields.Count; i < l; i++)
                             {
@@ -216,34 +205,34 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                                     sw.WriteLine($"{_parameterPrefix}{dbi.Fields[i].ParameterName})");
                             }
 
-                            sw.WriteLine($"{IndentSql(1)}</Request>");
+                            sw.WriteLine($"  </Request>");
                         }
 
                         if (dbi.UseUpdate)
                         {
-                            sw.WriteLine($"{IndentSql(1)}<Request Name=\"Update{dbi.ObjectName}\">");
-                            sw.WriteLine($"{IndentSql(2)}UPDATE {dbi.TableName} SET");
+                            sw.WriteLine($"  <Request Name=\"Update{dbi.ObjectName}\">");
+                            sw.WriteLine($"    UPDATE {dbi.TableName} SET");
 
                             for (int i = 0, l = dbi.Fields.Count; i < l; i++)
                             {
                                 if (i < l - 1)
-                                    sw.WriteLine($"{IndentSql(3)}{dbi.Fields[i].DbFieldName} = {_parameterPrefix}{dbi.Fields[i].ParameterName},");
+                                    sw.WriteLine($"      {dbi.Fields[i].DbFieldName} = {_parameterPrefix}{dbi.Fields[i].ParameterName},");
                                 else
-                                    sw.WriteLine($"{IndentSql(3)}{dbi.Fields[i].DbFieldName} = {_parameterPrefix}{dbi.Fields[i].ParameterName}");
+                                    sw.WriteLine($"      {dbi.Fields[i].DbFieldName} = {_parameterPrefix}{dbi.Fields[i].ParameterName}");
                             }
 
-                            sw.WriteLine($"{IndentSql(2)}WHERE");
-                            sw.WriteLine($"{IndentSql(3)}{dbi.Fields[0].DbFieldName} = {_parameterPrefix}{dbi.Fields[0].ParameterName}");
-                            sw.WriteLine($"{IndentSql(1)}</Request>");
+                            sw.WriteLine($"    WHERE");
+                            sw.WriteLine($"      {dbi.Fields[0].DbFieldName} = {_parameterPrefix}{dbi.Fields[0].ParameterName}");
+                            sw.WriteLine($"  </Request>");
                         }
 
                         if (dbi.UseDelete)
                         {
-                            sw.WriteLine($"{IndentSql(1)}<Request Name=\"Delete{dbi.ObjectName}\">");
-                            sw.WriteLine($"{IndentSql(2)}DELETE FROM {dbi.TableName}");
-                            sw.WriteLine($"{IndentSql(2)}WHERE");
-                            sw.WriteLine($"{IndentSql(3)}{dbi.Fields[0].DbFieldName} = {_parameterPrefix}{dbi.Fields[0].ParameterName}");
-                            sw.WriteLine($"{IndentSql(1)}</Request>");
+                            sw.WriteLine($"  <Request Name=\"Delete{dbi.ObjectName}\">");
+                            sw.WriteLine($"    DELETE FROM {dbi.TableName}");
+                            sw.WriteLine($"    WHERE");
+                            sw.WriteLine($"      {dbi.Fields[0].DbFieldName} = {_parameterPrefix}{dbi.Fields[0].ParameterName}");
+                            sw.WriteLine($"  </Request>");
                         }
 
                         sw.WriteLine("</Requests>");
@@ -268,81 +257,81 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                     sw.WriteLine();
                     sw.WriteLine($"namespace {_dbLayerNamespace}");
                     sw.WriteLine("{"); //start namespace
-                    sw.WriteLine($"{IndentCs(1)}public partial class {_dbLayerObjectName}");
-                    sw.WriteLine($"{IndentCs(1)}{{"); //start class
+                    sw.WriteLine($"    public partial class {_dbLayerObjectName}");
+                    sw.WriteLine($"    {{"); //start class
 
-                    sw.WriteLine($"{IndentCs(2)}private string _connectionString;");
-                    sw.WriteLine($"{IndentCs(2)}private string _provider;");
-                    sw.WriteLine($"{IndentCs(2)}private string _requestDirectory;");
-                    sw.WriteLine($"{IndentCs(2)}private ILog _logger;");
-                    sw.WriteLine($"{IndentCs(2)}private DbManager _db;");
+                    sw.WriteLine($"        private string _connectionString;");
+                    sw.WriteLine($"        private string _provider;");
+                    sw.WriteLine($"        private string _requestDirectory;");
+                    sw.WriteLine($"        private ILog _logger;");
+                    sw.WriteLine($"        private DbManager _db;");
                     sw.WriteLine();
 
                     //Constructor
-                    sw.WriteLine($"{IndentCs(2)}public {_dbLayerObjectName}(string connectionString, string provider, string requestDirectory, ILog logger)");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}_connectionString = connectionString;");
-                    sw.WriteLine($"{IndentCs(3)}_provider = provider;");
-                    sw.WriteLine($"{IndentCs(3)}_requestDirectory = requestDirectory;");
-                    sw.WriteLine($"{IndentCs(3)}_logger = logger;");
-                    sw.WriteLine($"{IndentCs(3)}_db = new DbManager(_connectionString, _provider);");
+                    sw.WriteLine($"        public {_dbLayerObjectName}(string connectionString, string provider, string requestDirectory, ILog logger)");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            _connectionString = connectionString;");
+                    sw.WriteLine($"            _provider = provider;");
+                    sw.WriteLine($"            _requestDirectory = requestDirectory;");
+                    sw.WriteLine($"            _logger = logger;");
+                    sw.WriteLine($"            _db = new DbManager(_connectionString, _provider);");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(3)}RegisterDbObjects();");
-                    sw.WriteLine($"{IndentCs(3)}ReadRequestFiles();");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"            RegisterDbObjects();");
+                    sw.WriteLine($"            ReadRequestFiles();");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //Properties
-                    sw.WriteLine($"{IndentCs(2)}public DbManager DbManager");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}get {{ return _db; }}");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public DbManager DbManager");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            get {{ return _db; }}");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //Open
-                    sw.WriteLine($"{IndentCs(2)}public void Open()");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}_db.Open();");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public void Open()");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            _db.Open();");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //Close
-                    sw.WriteLine($"{IndentCs(2)}public void Close()");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}_db.Close();");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public void Close()");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            _db.Close();");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //RegisterDbObjects
-                    sw.WriteLine($"{IndentCs(2)}private void RegisterDbObjects()");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}try");
-                    sw.WriteLine($"{IndentCs(3)}{{");
+                    sw.WriteLine($"        private void RegisterDbObjects()");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            try");
+                    sw.WriteLine($"            {{");
                     foreach(DbItem dbi in _dbItems)
-                        sw.WriteLine($"{IndentCs(4)}_db.RegisterDbObject(typeof({dbi.ObjectName}));");
-                    sw.WriteLine($"{IndentCs(3)}}}");
-                    sw.WriteLine($"{IndentCs(3)}catch (Exception ex)");
-                    sw.WriteLine($"{IndentCs(3)}{{");
-                    sw.WriteLine($"{IndentCs(4)}_logger.Fatal(\"An error occured while registering db objects\", ex);");
-                    sw.WriteLine($"{IndentCs(3)}}}");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                        sw.WriteLine($"                _db.RegisterDbObject(typeof({dbi.ObjectName}));");
+                    sw.WriteLine($"            }}");
+                    sw.WriteLine($"            catch (Exception ex)");
+                    sw.WriteLine($"            {{");
+                    sw.WriteLine($"                _logger.Fatal(\"An error occured while registering db objects\", ex);");
+                    sw.WriteLine($"            }}");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
                     
                     //ReadRequestFiles
-                    sw.WriteLine($"{IndentCs(2)}private void ReadRequestFiles()");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}try");
-                    sw.WriteLine($"{IndentCs(3)}{{");
+                    sw.WriteLine($"        private void ReadRequestFiles()");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            try");
+                    sw.WriteLine($"            {{");
                     foreach(DbItem dbi in _dbItems)
-                        sw.WriteLine($"{IndentCs(4)}_db.AddRequestFile(\"{dbi.ObjectName}\", Path.Combine(_requestDirectory, \"{dbi.ObjectName}.xml\"));");
-                    sw.WriteLine($"{IndentCs(3)}}}");
-                    sw.WriteLine($"{IndentCs(3)}catch (Exception ex)");
-                    sw.WriteLine($"{IndentCs(3)}{{");
-                    sw.WriteLine($"{IndentCs(4)}_logger.Fatal(\"An error occured while reading request files\", ex);");
-                    sw.WriteLine($"{IndentCs(3)}}}");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                        sw.WriteLine($"                _db.AddRequestFile(\"{dbi.ObjectName}\", Path.Combine(_requestDirectory, \"{dbi.ObjectName}.xml\"));");
+                    sw.WriteLine($"            }}");
+                    sw.WriteLine($"            catch (Exception ex)");
+                    sw.WriteLine($"            {{");
+                    sw.WriteLine($"                _logger.Fatal(\"An error occured while reading request files\", ex);");
+                    sw.WriteLine($"            }}");
+                    sw.WriteLine($"        }}");
                     
-                    sw.WriteLine($"{IndentCs(1)}}}"); //end class
+                    sw.WriteLine($"    }}"); //end class
                     sw.WriteLine("}"); //end namespace
                 }
             }
@@ -364,177 +353,177 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                     sw.WriteLine();
                     sw.WriteLine($"namespace {_dbLayerNamespace}");
                     sw.WriteLine("{"); //start namespace
-                    sw.WriteLine($"{IndentCs(1)}public partial class {_dbLayerObjectName}");
-                    sw.WriteLine($"{IndentCs(1)}{{"); //start class
+                    sw.WriteLine($"    public partial class {_dbLayerObjectName}");
+                    sw.WriteLine($"    {{"); //start class
 
-                    sw.WriteLine($"{IndentCs(2)}private bool _disposed;");
-                    sw.WriteLine($"{IndentCs(2)}private string _connectionString;");
-                    sw.WriteLine($"{IndentCs(2)}private string _provider;");
-                    sw.WriteLine($"{IndentCs(2)}private DbProviderFactory _factory;");
-                    sw.WriteLine($"{IndentCs(2)}private DbConnection _connection;");
-                    sw.WriteLine($"{IndentCs(2)}private DbTransaction _transaction;");
-                    sw.WriteLine($"{IndentCs(2)}private Dictionary<string, Dictionary<string, string>> _requests;");
+                    sw.WriteLine($"        private bool _disposed;");
+                    sw.WriteLine($"        private string _connectionString;");
+                    sw.WriteLine($"        private string _provider;");
+                    sw.WriteLine($"        private DbProviderFactory _factory;");
+                    sw.WriteLine($"        private DbConnection _connection;");
+                    sw.WriteLine($"        private DbTransaction _transaction;");
+                    sw.WriteLine($"        private Dictionary<string, Dictionary<string, string>> _requests;");
                     sw.WriteLine();
 
                     //Constructor
-                    sw.WriteLine($"{IndentCs(2)}public {_dbLayerObjectName}(string connectionString, string provider)");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}_connectionString = connectionString;");
-                    sw.WriteLine($"{IndentCs(3)}_provider = provider;");
-                    sw.WriteLine($"{IndentCs(3)}_factory = DbProviderFactories.GetFactory(_provider);");
-                    sw.WriteLine($"{IndentCs(3)}_connection = _factory.CreateConnection();");
-                    sw.WriteLine($"{IndentCs(3)}_connection.ConnectionString = _connectionString;");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public {_dbLayerObjectName}(string connectionString, string provider)");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            _connectionString = connectionString;");
+                    sw.WriteLine($"            _provider = provider;");
+                    sw.WriteLine($"            _factory = DbProviderFactories.GetFactory(_provider);");
+                    sw.WriteLine($"            _connection = _factory.CreateConnection();");
+                    sw.WriteLine($"            _connection.ConnectionString = _connectionString;");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //Destructor
-                    sw.WriteLine($"{IndentCs(2)}~{_dbLayerObjectName}()");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}Dispose(false);");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        ~{_dbLayerObjectName}()");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            Dispose(false);");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //Properties
-                    sw.WriteLine($"{IndentCs(2)}public bool Disposed");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}get {{ return _disposed; }}");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public bool Disposed");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            get {{ return _disposed; }}");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(2)}public string ConnectionString");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}get {{ return _connectionString; }}");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public string ConnectionString");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            get {{ return _connectionString; }}");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(2)}public string Provider");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}get {{ return _provider; }}");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public string Provider");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            get {{ return _provider; }}");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(2)}public DbProviderFactory Factory");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}get {{ return _factory; }}");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public DbProviderFactory Factory");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            get {{ return _factory; }}");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(2)}public DbConnection Connection");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}get {{ return _connection; }}");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public DbConnection Connection");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            get {{ return _connection; }}");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(2)}public DbTransaction Transaction");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}get {{ return _transaction; }}");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public DbTransaction Transaction");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            get {{ return _transaction; }}");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(2)}public Dictionary<string, Dictionary<string, string>> Requests");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}get {{ return _requests; }}");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public Dictionary<string, Dictionary<string, string>> Requests");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            get {{ return _requests; }}");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //Open
-                    sw.WriteLine($"{IndentCs(2)}public void Open()");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}if (_disposed)");
-                    sw.WriteLine($"{IndentCs(4)}throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
+                    sw.WriteLine($"        public void Open()");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            if (_disposed)");
+                    sw.WriteLine($"                throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(3)}_db.Open();");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"            _db.Open();");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //Close
-                    sw.WriteLine($"{IndentCs(2)}public void Close()");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}if (_disposed)");
-                    sw.WriteLine($"{IndentCs(4)}throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
+                    sw.WriteLine($"        public void Close()");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            if (_disposed)");
+                    sw.WriteLine($"                throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(3)}_db.Close();");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"            _db.Close();");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //BeginTransaction
-                    sw.WriteLine($"{IndentCs(2)}public void BeginTransaction()");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}if (_disposed)");
-                    sw.WriteLine($"{IndentCs(4)}throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
+                    sw.WriteLine($"        public void BeginTransaction()");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            if (_disposed)");
+                    sw.WriteLine($"                throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(3)}_transaction = _connection.BeginTransaction();");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"            _transaction = _connection.BeginTransaction();");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //EndTransaction
-                    sw.WriteLine($"{IndentCs(2)}public void EndTransaction(bool commit)");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}if (_disposed)");
-                    sw.WriteLine($"{IndentCs(4)}throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
+                    sw.WriteLine($"        public void EndTransaction(bool commit)");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            if (_disposed)");
+                    sw.WriteLine($"                throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(3)}if (_transaction != null)");
-                    sw.WriteLine($"{IndentCs(3)}{{");
-                    sw.WriteLine($"{IndentCs(4)}if (commit)");
-                    sw.WriteLine($"{IndentCs(5)}_transaction.Commit();");
-                    sw.WriteLine($"{IndentCs(4)}else");
-                    sw.WriteLine($"{IndentCs(5)}_transaction.Rollback();");
+                    sw.WriteLine($"            if (_transaction != null)");
+                    sw.WriteLine($"            {{");
+                    sw.WriteLine($"                if (commit)");
+                    sw.WriteLine($"                    _transaction.Commit();");
+                    sw.WriteLine($"                else");
+                    sw.WriteLine($"                    _transaction.Rollback();");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(4)}_transaction = null;");
-                    sw.WriteLine($"{IndentCs(3)}}}");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"                _transaction = null;");
+                    sw.WriteLine($"            }}");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //CreateParameter
-                    sw.WriteLine($"{IndentCs(2)}public void CreateParameter()");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}if (_disposed)");
-                    sw.WriteLine($"{IndentCs(4)}throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
+                    sw.WriteLine($"        public void CreateParameter()");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            if (_disposed)");
+                    sw.WriteLine($"                throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(3)}return _factory.CreateParameter();");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"            return _factory.CreateParameter();");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //CreateParameter2
-                    sw.WriteLine($"{IndentCs(2)}public void CreateParameter(string name, object value, ParameterDirection paramDirection = ParameterDirection.Input)");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}if (_disposed)");
-                    sw.WriteLine($"{IndentCs(4)}throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
+                    sw.WriteLine($"        public void CreateParameter(string name, object value, ParameterDirection paramDirection = ParameterDirection.Input)");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            if (_disposed)");
+                    sw.WriteLine($"                throw new ObjectDisposedException(typeof({_dbLayerObjectName}).FullName);");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(3)}DbParameter param = _factory.CreateParameter();");
-                    sw.WriteLine($"{IndentCs(3)}param.ParameterName = name;");
-                    sw.WriteLine($"{IndentCs(3)}param.Value = value;");
-                    sw.WriteLine($"{IndentCs(3)}param.Direction = paramDirection;");
-                    sw.WriteLine($"{IndentCs(3)}return param;");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"            DbParameter param = _factory.CreateParameter();");
+                    sw.WriteLine($"            param.ParameterName = name;");
+                    sw.WriteLine($"            param.Value = value;");
+                    sw.WriteLine($"            param.Direction = paramDirection;");
+                    sw.WriteLine($"            return param;");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //Dispose
-                    sw.WriteLine($"{IndentCs(2)}public void Dispose()");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}Dispose(true);");
-                    sw.WriteLine($"{IndentCs(3)}GC.SuppressFinalize(this);");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"        public void Dispose()");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            Dispose(true);");
+                    sw.WriteLine($"            GC.SuppressFinalize(this);");
+                    sw.WriteLine($"        }}");
                     sw.WriteLine();
 
                     //Dispose2
-                    sw.WriteLine($"{IndentCs(2)}public void Dispose(bool disposing)");
-                    sw.WriteLine($"{IndentCs(2)}{{");
-                    sw.WriteLine($"{IndentCs(3)}if (_disposed)");
-                    sw.WriteLine($"{IndentCs(4)}return;");
+                    sw.WriteLine($"        public void Dispose(bool disposing)");
+                    sw.WriteLine($"        {{");
+                    sw.WriteLine($"            if (_disposed)");
+                    sw.WriteLine($"                return;");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(3)}if (disposing)");
-                    sw.WriteLine($"{IndentCs(3)}{{"); //start if disposing
-                    sw.WriteLine($"{IndentCs(4)}if (_connection != null)");
-                    sw.WriteLine($"{IndentCs(4)}{{");
-                    sw.WriteLine($"{IndentCs(5)}_connection.Dispose();");
-                    sw.WriteLine($"{IndentCs(5)}_connection = null;");
-                    sw.WriteLine($"{IndentCs(4)}}}");
+                    sw.WriteLine($"            if (disposing)");
+                    sw.WriteLine($"            {{"); //start if disposing
+                    sw.WriteLine($"                if (_connection != null)");
+                    sw.WriteLine($"                {{");
+                    sw.WriteLine($"                    _connection.Dispose();");
+                    sw.WriteLine($"                    _connection = null;");
+                    sw.WriteLine($"                }}");
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(4)}_transaction = null;");
-                    sw.WriteLine($"{IndentCs(4)}_factory = null;");
-                    sw.WriteLine($"{IndentCs(4)}_connectionString = null;");
-                    sw.WriteLine($"{IndentCs(4)}_provider = null;");
-                    sw.WriteLine($"{IndentCs(3)}}}"); //end if disposing
+                    sw.WriteLine($"                _transaction = null;");
+                    sw.WriteLine($"                _factory = null;");
+                    sw.WriteLine($"                _connectionString = null;");
+                    sw.WriteLine($"                _provider = null;");
+                    sw.WriteLine($"            }}"); //end if disposing
                     sw.WriteLine();
-                    sw.WriteLine($"{IndentCs(3)}_disposed = true;");
-                    sw.WriteLine($"{IndentCs(2)}}}");
+                    sw.WriteLine($"            _disposed = true;");
+                    sw.WriteLine($"        }}");
 
-                    sw.WriteLine($"{IndentCs(1)}}}"); //end class
+                    sw.WriteLine($"    }}"); //end class
                     sw.WriteLine("}"); //end namespace
                 }
             }
@@ -560,16 +549,16 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                         sw.WriteLine();
                         sw.WriteLine($"namespace {_dbLayerNamespace}");
                         sw.WriteLine("{"); //start namespace
-                        sw.WriteLine($"{IndentCs(1)}public partial class {_dbLayerObjectName}");
-                        sw.WriteLine($"{IndentCs(1)}{{"); //start class
+                        sw.WriteLine($"    public partial class {_dbLayerObjectName}");
+                        sw.WriteLine($"    {{"); //start class
 
                         if (dbi.UseSelectAll)
                         {
-                            sw.WriteLine($"{IndentCs(2)}public List<{dbi.ObjectName}> SelectAll{dbi.ObjectName}s()");
-                            sw.WriteLine($"{IndentCs(2)}{{"); //start SelectAll
-                            sw.WriteLine($"{IndentCs(3)}List<{dbi.ObjectName}> list = _db[\"{dbi.ObjectName}\"].FillObjects<{dbi.ObjectName}>(\"SelectAll{dbi.ObjectName}s\", null);");
-                            sw.WriteLine($"{IndentCs(3)}return list;");
-                            sw.WriteLine($"{IndentCs(2)}}}"); //end SelectAll
+                            sw.WriteLine($"        public List<{dbi.ObjectName}> SelectAll{dbi.ObjectName}s()");
+                            sw.WriteLine($"        {{"); //start SelectAll
+                            sw.WriteLine($"            List<{dbi.ObjectName}> list = _db[\"{dbi.ObjectName}\"].FillObjects<{dbi.ObjectName}>(\"SelectAll{dbi.ObjectName}s\", null);");
+                            sw.WriteLine($"            return list;");
+                            sw.WriteLine($"        }}"); //end SelectAll
                             first = false;
                         }
 
@@ -578,15 +567,15 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                             if (!first)
                                 sw.WriteLine();
 
-                            sw.WriteLine($"{IndentCs(2)}public {dbi.ObjectName} Select{dbi.ObjectName}ById({dbi.Fields[0].DataType} {dbi.Fields[0].ParameterName})");
-                            sw.WriteLine($"{IndentCs(2)}{{"); //start SelectById
-                            sw.WriteLine($"{IndentCs(3)}List<DbParameter> parameters = new List<DbParameter>();");
-                            sw.WriteLine($"{IndentCs(3)}parameters.Add(_db.CreateParameter(\"{dbi.Fields[0].ParameterName}\", {dbi.Fields[0].ParameterName}));");
-                            sw.WriteLine($"{IndentCs(3)}List<{dbi.ObjectName}> list = _db[\"{dbi.ObjectName}\"].FillObjects<{dbi.ObjectName}>(\"Select{dbi.ObjectName}ById\", parameters);");
-                            sw.WriteLine($"{IndentCs(3)}if (list.Count == 0)");
-                            sw.WriteLine($"{IndentCs(4)}return null;");
-                            sw.WriteLine($"{IndentCs(3)}return list[0];");
-                            sw.WriteLine($"{IndentCs(2)}}}"); //end SelectById
+                            sw.WriteLine($"        public {dbi.ObjectName} Select{dbi.ObjectName}ById({dbi.Fields[0].DataType} {dbi.Fields[0].ParameterName})");
+                            sw.WriteLine($"        {{"); //start SelectById
+                            sw.WriteLine($"            List<DbParameter> parameters = new List<DbParameter>();");
+                            sw.WriteLine($"            parameters.Add(_db.CreateParameter(\"{dbi.Fields[0].ParameterName}\", {dbi.Fields[0].ParameterName}));");
+                            sw.WriteLine($"            List<{dbi.ObjectName}> list = _db[\"{dbi.ObjectName}\"].FillObjects<{dbi.ObjectName}>(\"Select{dbi.ObjectName}ById\", parameters);");
+                            sw.WriteLine($"            if (list.Count == 0)");
+                            sw.WriteLine($"                return null;");
+                            sw.WriteLine($"            return list[0];");
+                            sw.WriteLine($"        }}"); //end SelectById
                             first = false;
                         }
 
@@ -595,15 +584,15 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                             if (!first)
                                 sw.WriteLine();
 
-                            sw.WriteLine($"{IndentCs(2)}public void Insert{dbi.ObjectName}({dbi.ObjectName} {minObjName})");
-                            sw.WriteLine($"{IndentCs(2)}{{"); //start Insert
-                            sw.WriteLine($"{IndentCs(3)}List<DbParameter> parameters = new List<DbParameter>();");
+                            sw.WriteLine($"        public void Insert{dbi.ObjectName}({dbi.ObjectName} {minObjName})");
+                            sw.WriteLine($"        {{"); //start Insert
+                            sw.WriteLine($"            List<DbParameter> parameters = new List<DbParameter>();");
 
                             foreach (DbField field in dbi.Fields)
-                                sw.WriteLine($"{IndentCs(3)}parameters.Add(_db.CreateParameter(\"{field.ParameterName}\", {minObjName}.{field.PropertyName}));");
+                                sw.WriteLine($"            parameters.Add(_db.CreateParameter(\"{field.ParameterName}\", {minObjName}.{field.PropertyName}));");
 
-                            sw.WriteLine($"{IndentCs(3)}_db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Insert{dbi.ObjectName}\", parameters);");
-                            sw.WriteLine($"{IndentCs(2)}}}"); //end Insert
+                            sw.WriteLine($"            _db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Insert{dbi.ObjectName}\", parameters);");
+                            sw.WriteLine($"        }}"); //end Insert
                             first = false;
                         }
 
@@ -612,15 +601,15 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                             if (!first)
                                 sw.WriteLine();
 
-                            sw.WriteLine($"{IndentCs(2)}public void Update{dbi.ObjectName}({dbi.ObjectName} {minObjName})");
-                            sw.WriteLine($"{IndentCs(2)}{{"); //start Update
-                            sw.WriteLine($"{IndentCs(3)}List<DbParameter> parameters = new List<DbParameter>();");
+                            sw.WriteLine($"        public void Update{dbi.ObjectName}({dbi.ObjectName} {minObjName})");
+                            sw.WriteLine($"        {{"); //start Update
+                            sw.WriteLine($"            List<DbParameter> parameters = new List<DbParameter>();");
 
                             foreach (DbField field in dbi.Fields)
-                                sw.WriteLine($"{IndentCs(3)}parameters.Add(_db.CreateParameter(\"{field.ParameterName}\", {minObjName}.{field.PropertyName}));");
+                                sw.WriteLine($"            parameters.Add(_db.CreateParameter(\"{field.ParameterName}\", {minObjName}.{field.PropertyName}));");
 
-                            sw.WriteLine($"{IndentCs(3)}_db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Update{dbi.ObjectName}\", parameters);");
-                            sw.WriteLine($"{IndentCs(2)}}}"); //end Update
+                            sw.WriteLine($"            _db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Update{dbi.ObjectName}\", parameters);");
+                            sw.WriteLine($"        }}"); //end Update
                             first = false;
                         }
 
@@ -629,16 +618,16 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                             if (!first)
                                 sw.WriteLine();
 
-                            sw.WriteLine($"{IndentCs(2)}public void Delete{dbi.ObjectName}({dbi.Fields[0].DataType} {dbi.Fields[0].ParameterName})");
-                            sw.WriteLine($"{IndentCs(2)}{{"); //start Delete
-                            sw.WriteLine($"{IndentCs(3)}List<DbParameter> parameters = new List<DbParameter>();");
-                            sw.WriteLine($"{IndentCs(3)}parameters.Add(_db.CreateParameter(\"{dbi.Fields[0].ParameterName}\", {dbi.Fields[0].ParameterName}));");
-                            sw.WriteLine($"{IndentCs(3)}_db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Delete{dbi.ObjectName}\", parameters);");
-                            sw.WriteLine($"{IndentCs(2)}}}"); //end Delete
+                            sw.WriteLine($"        public void Delete{dbi.ObjectName}({dbi.Fields[0].DataType} {dbi.Fields[0].ParameterName})");
+                            sw.WriteLine($"        {{"); //start Delete
+                            sw.WriteLine($"            List<DbParameter> parameters = new List<DbParameter>();");
+                            sw.WriteLine($"            parameters.Add(_db.CreateParameter(\"{dbi.Fields[0].ParameterName}\", {dbi.Fields[0].ParameterName}));");
+                            sw.WriteLine($"            _db[\"{dbi.ObjectName}\"].ExecuteNonQuery(\"Delete{dbi.ObjectName}\", parameters);");
+                            sw.WriteLine($"        }}"); //end Delete
                             first = false;
                         }
 
-                        sw.WriteLine($"{IndentCs(1)}}}"); //end class
+                        sw.WriteLine($"    }}"); //end class
                         sw.WriteLine("}"); //end namespace
                     }
                 }
@@ -666,44 +655,44 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                         sw.WriteLine();
                         sw.WriteLine($"namespace {_dbLayerNamespace}");
                         sw.WriteLine("{"); //start namespace
-                        sw.WriteLine($"{IndentCs(1)}public partial class {_dbLayerObjectName}");
-                        sw.WriteLine($"{IndentCs(1)}{{"); //start class
+                        sw.WriteLine($"    public partial class {_dbLayerObjectName}");
+                        sw.WriteLine($"    {{"); //start class
 
                         if (dbi.UseSelectAll)
                         {
-                            sw.WriteLine($"{IndentCs(2)}public List<{dbi.ObjectName}> SelectAll{dbi.ObjectName}s()");
-                            sw.WriteLine($"{IndentCs(2)}{{"); //start SelectAll
-                            sw.WriteLine($"{IndentCs(3)}if (Disposed)");
-                            sw.WriteLine($"{IndentCs(4)}throw new ObjectDisposedException(typeof(DbManager).FullName);");
+                            sw.WriteLine($"        public List<{dbi.ObjectName}> SelectAll{dbi.ObjectName}s()");
+                            sw.WriteLine($"        {{"); //start SelectAll
+                            sw.WriteLine($"            if (Disposed)");
+                            sw.WriteLine($"                throw new ObjectDisposedException(typeof(DbManager).FullName);");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(3)}List<{dbi.ObjectName}> list = new List<{dbi.ObjectName}>();");
+                            sw.WriteLine($"            List<{dbi.ObjectName}> list = new List<{dbi.ObjectName}>();");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(3)}using (DbCommand command = Connection.CreateCommand())");
-                            sw.WriteLine($"{IndentCs(3)}{{"); //start DbCommand
-                            sw.WriteLine($"{IndentCs(4)}command.CommandType = CommandType.Text;");
-                            sw.WriteLine($"{IndentCs(4)}command.CommandText = Requests[\"{dbi.ObjectName}\"][\"SelectAll{dbi.ObjectName}s\"];");
+                            sw.WriteLine($"            using (DbCommand command = Connection.CreateCommand())");
+                            sw.WriteLine($"            {{"); //start DbCommand
+                            sw.WriteLine($"                command.CommandType = CommandType.Text;");
+                            sw.WriteLine($"                command.CommandText = Requests[\"{dbi.ObjectName}\"][\"SelectAll{dbi.ObjectName}s\"];");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(4)}using (DbDataReader reader = command.ExecuteReader())");
-                            sw.WriteLine($"{IndentCs(4)}{{"); //start DbDataReader
-                            sw.WriteLine($"{IndentCs(5)}while (reader.Read())");
-                            sw.WriteLine($"{IndentCs(5)}{{"); //start reader.Read
-                            sw.WriteLine($"{IndentCs(6)}{dbi.ObjectName} obj = new {dbi.ObjectName}();");
+                            sw.WriteLine($"                using (DbDataReader reader = command.ExecuteReader())");
+                            sw.WriteLine($"                {{"); //start DbDataReader
+                            sw.WriteLine($"                    while (reader.Read())");
+                            sw.WriteLine($"                    {{"); //start reader.Read
+                            sw.WriteLine($"                        {dbi.ObjectName} obj = new {dbi.ObjectName}();");
 
                             foreach (DbField field in dbi.Fields)
                             {
-                                sw.WriteLine($"{IndentCs(6)}if (!(reader[\"{field.DbFieldName}\"] is DBNull))");
-                                sw.WriteLine($"{IndentCs(7)}obj.{field.PropertyName} = ({field.DataType})reader[\"{field.DbFieldName}\"];");
+                                sw.WriteLine($"                        if (!(reader[\"{field.DbFieldName}\"] is DBNull))");
+                                sw.WriteLine($"                            obj.{field.PropertyName} = ({field.DataType})reader[\"{field.DbFieldName}\"];");
                             }
 
-                            sw.WriteLine($"{IndentCs(6)}list.Add(obj);");
-                            sw.WriteLine($"{IndentCs(5)}}}"); //end reader.Read
+                            sw.WriteLine($"                        list.Add(obj);");
+                            sw.WriteLine($"                    }}"); //end reader.Read
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(5)}reader.Close();");
-                            sw.WriteLine($"{IndentCs(4)}}}"); //end DbDataReader
-                            sw.WriteLine($"{IndentCs(3)}}}"); //end DbCommand
+                            sw.WriteLine($"                    reader.Close();");
+                            sw.WriteLine($"                }}"); //end DbDataReader
+                            sw.WriteLine($"            }}"); //end DbCommand
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(3)}return list;");
-                            sw.WriteLine($"{IndentCs(2)}}}"); //end SelectAll
+                            sw.WriteLine($"            return list;");
+                            sw.WriteLine($"        }}"); //end SelectAll
                             first = false;
                         }
 
@@ -712,43 +701,43 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                             if (!first)
                                 sw.WriteLine();
 
-                            sw.WriteLine($"{IndentCs(2)}public {dbi.ObjectName} Select{dbi.ObjectName}ById({dbi.Fields[0].DataType} {dbi.Fields[0].ParameterName})");
-                            sw.WriteLine($"{IndentCs(2)}{{"); //start SelectById
-                            sw.WriteLine($"{IndentCs(3)}if (Disposed)");
-                            sw.WriteLine($"{IndentCs(4)}throw new ObjectDisposedException(typeof(DbManager).FullName);");
+                            sw.WriteLine($"        public {dbi.ObjectName} Select{dbi.ObjectName}ById({dbi.Fields[0].DataType} {dbi.Fields[0].ParameterName})");
+                            sw.WriteLine($"        {{"); //start SelectById
+                            sw.WriteLine($"            if (Disposed)");
+                            sw.WriteLine($"                throw new ObjectDisposedException(typeof(DbManager).FullName);");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(3)}List<{dbi.ObjectName}> list = new List<{dbi.ObjectName}>();");
+                            sw.WriteLine($"            List<{dbi.ObjectName}> list = new List<{dbi.ObjectName}>();");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(3)}using (DbCommand command = Connection.CreateCommand())");
-                            sw.WriteLine($"{IndentCs(3)}{{"); //start DbCommand
-                            sw.WriteLine($"{IndentCs(4)}command.CommandType = CommandType.Text;");
-                            sw.WriteLine($"{IndentCs(4)}command.CommandText = Requests[\"{dbi.ObjectName}\"][\"Select{dbi.ObjectName}ById\"];");
+                            sw.WriteLine($"            using (DbCommand command = Connection.CreateCommand())");
+                            sw.WriteLine($"            {{"); //start DbCommand
+                            sw.WriteLine($"                command.CommandType = CommandType.Text;");
+                            sw.WriteLine($"                command.CommandText = Requests[\"{dbi.ObjectName}\"][\"Select{dbi.ObjectName}ById\"];");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(4)}command.Parameters.Add(CreateParameter(\"{dbi.Fields[0].ParameterName}\", {dbi.Fields[0].ParameterName}));");
+                            sw.WriteLine($"                command.Parameters.Add(CreateParameter(\"{dbi.Fields[0].ParameterName}\", {dbi.Fields[0].ParameterName}));");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(4)}using (DbDataReader reader = command.ExecuteReader())");
-                            sw.WriteLine($"{IndentCs(4)}{{"); //start DbDataReader
-                            sw.WriteLine($"{IndentCs(5)}while (reader.Read())");
-                            sw.WriteLine($"{IndentCs(5)}{{"); //start reader.Read
-                            sw.WriteLine($"{IndentCs(6)}{dbi.ObjectName} obj = new {dbi.ObjectName}();");
+                            sw.WriteLine($"                using (DbDataReader reader = command.ExecuteReader())");
+                            sw.WriteLine($"                {{"); //start DbDataReader
+                            sw.WriteLine($"                    while (reader.Read())");
+                            sw.WriteLine($"                    {{"); //start reader.Read
+                            sw.WriteLine($"                        {dbi.ObjectName} obj = new {dbi.ObjectName}();");
 
                             foreach (DbField field in dbi.Fields)
                             {
-                                sw.WriteLine($"{IndentCs(6)}if (!(reader[\"{field.DbFieldName}\"] is DBNull))");
-                                sw.WriteLine($"{IndentCs(7)}obj.{field.PropertyName} = ({field.DataType})reader[\"{field.DbFieldName}\"];");
+                                sw.WriteLine($"                        if (!(reader[\"{field.DbFieldName}\"] is DBNull))");
+                                sw.WriteLine($"                            obj.{field.PropertyName} = ({field.DataType})reader[\"{field.DbFieldName}\"];");
                             }
 
-                            sw.WriteLine($"{IndentCs(6)}list.Add(obj);");
-                            sw.WriteLine($"{IndentCs(5)}}}"); //end reader.Read
+                            sw.WriteLine($"                        list.Add(obj);");
+                            sw.WriteLine($"                    }}"); //end reader.Read
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(5)}reader.Close();");
-                            sw.WriteLine($"{IndentCs(4)}}}"); //end DbDataReader
-                            sw.WriteLine($"{IndentCs(3)}}}"); //end DbCommand
+                            sw.WriteLine($"                    reader.Close();");
+                            sw.WriteLine($"                }}"); //end DbDataReader
+                            sw.WriteLine($"            }}"); //end DbCommand
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(3)}if (list.Count == 0)");
-                            sw.WriteLine($"{IndentCs(4)}return null;");
-                            sw.WriteLine($"{IndentCs(3)}return list[0];");
-                            sw.WriteLine($"{IndentCs(2)}}}"); //end SelectById
+                            sw.WriteLine($"            if (list.Count == 0)");
+                            sw.WriteLine($"                return null;");
+                            sw.WriteLine($"            return list[0];");
+                            sw.WriteLine($"        }}"); //end SelectById
                             first = false;
                         }
 
@@ -757,27 +746,27 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                             if (!first)
                                 sw.WriteLine();
 
-                            sw.WriteLine($"{IndentCs(2)}public int Insert{dbi.ObjectName}({dbi.ObjectName} {minObjName})");
-                            sw.WriteLine($"{IndentCs(2)}{{"); //start Insert
-                            sw.WriteLine($"{IndentCs(3)}if (Disposed)");
-                            sw.WriteLine($"{IndentCs(4)}throw new ObjectDisposedException(typeof(DbManager).FullName);");
+                            sw.WriteLine($"        public int Insert{dbi.ObjectName}({dbi.ObjectName} {minObjName})");
+                            sw.WriteLine($"        {{"); //start Insert
+                            sw.WriteLine($"            if (Disposed)");
+                            sw.WriteLine($"                throw new ObjectDisposedException(typeof(DbManager).FullName);");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(3)}using (DbCommand command = Connection.CreateCommand())");
-                            sw.WriteLine($"{IndentCs(3)}{{"); //start DbCommand
-                            sw.WriteLine($"{IndentCs(4)}command.CommandType = CommandType.Text;");
-                            sw.WriteLine($"{IndentCs(4)}command.CommandText = Requests[\"{dbi.ObjectName}\"][\"Insert{dbi.ObjectName}\"];");
+                            sw.WriteLine($"            using (DbCommand command = Connection.CreateCommand())");
+                            sw.WriteLine($"            {{"); //start DbCommand
+                            sw.WriteLine($"                command.CommandType = CommandType.Text;");
+                            sw.WriteLine($"                command.CommandText = Requests[\"{dbi.ObjectName}\"][\"Insert{dbi.ObjectName}\"];");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(4)}if (Transaction != null)");
-                            sw.WriteLine($"{IndentCs(5)}command.Transaction = Transaction;");
+                            sw.WriteLine($"                if (Transaction != null)");
+                            sw.WriteLine($"                    command.Transaction = Transaction;");
                             sw.WriteLine();
 
                             foreach(DbField field in dbi.Fields)
-                                sw.WriteLine($"{IndentCs(4)}command.Parameters.Add(CreateParameter(\"{field.ParameterName}\", {minObjName}.{field.PropertyName}));");
+                                sw.WriteLine($"                command.Parameters.Add(CreateParameter(\"{field.ParameterName}\", {minObjName}.{field.PropertyName}));");
 
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(4)}return command.ExecuteNonQuery();");
-                            sw.WriteLine($"{IndentCs(3)}}}"); //start DbCommand
-                            sw.WriteLine($"{IndentCs(2)}}}"); //end Insert
+                            sw.WriteLine($"                return command.ExecuteNonQuery();");
+                            sw.WriteLine($"            }}"); //start DbCommand
+                            sw.WriteLine($"        }}"); //end Insert
                             first = false;
                         }
 
@@ -786,27 +775,27 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                             if (!first)
                                 sw.WriteLine();
 
-                            sw.WriteLine($"{IndentCs(2)}public int Update{dbi.ObjectName}({dbi.ObjectName} {minObjName})");
-                            sw.WriteLine($"{IndentCs(2)}{{"); //start Update
-                            sw.WriteLine($"{IndentCs(3)}if (Disposed)");
-                            sw.WriteLine($"{IndentCs(4)}throw new ObjectDisposedException(typeof(DbManager).FullName);");
+                            sw.WriteLine($"        public int Update{dbi.ObjectName}({dbi.ObjectName} {minObjName})");
+                            sw.WriteLine($"        {{"); //start Update
+                            sw.WriteLine($"            if (Disposed)");
+                            sw.WriteLine($"                throw new ObjectDisposedException(typeof(DbManager).FullName);");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(3)}using (DbCommand command = Connection.CreateCommand())");
-                            sw.WriteLine($"{IndentCs(3)}{{"); //start DbCommand
-                            sw.WriteLine($"{IndentCs(4)}command.CommandType = CommandType.Text;");
-                            sw.WriteLine($"{IndentCs(4)}command.CommandText = Requests[\"{dbi.ObjectName}\"][\"Update{dbi.ObjectName}\"];");
+                            sw.WriteLine($"            using (DbCommand command = Connection.CreateCommand())");
+                            sw.WriteLine($"            {{"); //start DbCommand
+                            sw.WriteLine($"                command.CommandType = CommandType.Text;");
+                            sw.WriteLine($"                command.CommandText = Requests[\"{dbi.ObjectName}\"][\"Update{dbi.ObjectName}\"];");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(4)}if (Transaction != null)");
-                            sw.WriteLine($"{IndentCs(5)}command.Transaction = Transaction;");
+                            sw.WriteLine($"                if (Transaction != null)");
+                            sw.WriteLine($"                    command.Transaction = Transaction;");
                             sw.WriteLine();
 
                             foreach (DbField field in dbi.Fields)
-                                sw.WriteLine($"{IndentCs(4)}command.Parameters.Add(CreateParameter(\"{field.ParameterName}\", {minObjName}.{field.PropertyName}));");
+                                sw.WriteLine($"                command.Parameters.Add(CreateParameter(\"{field.ParameterName}\", {minObjName}.{field.PropertyName}));");
 
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(4)}return command.ExecuteNonQuery();");
-                            sw.WriteLine($"{IndentCs(3)}}}"); //start DbCommand
-                            sw.WriteLine($"{IndentCs(2)}}}"); //end Update
+                            sw.WriteLine($"                return command.ExecuteNonQuery();");
+                            sw.WriteLine($"            }}"); //start DbCommand
+                            sw.WriteLine($"        }}"); //end Update
                             first = false;
                         }
 
@@ -815,42 +804,32 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                             if (!first)
                                 sw.WriteLine();
 
-                            sw.WriteLine($"{IndentCs(2)}public int Delete{dbi.ObjectName}({dbi.Fields[0].DataType} {dbi.Fields[0].ParameterName})");
-                            sw.WriteLine($"{IndentCs(2)}{{"); //start Delete
-                            sw.WriteLine($"{IndentCs(3)}if (Disposed)");
-                            sw.WriteLine($"{IndentCs(4)}throw new ObjectDisposedException(typeof(DbManager).FullName);");
+                            sw.WriteLine($"        public int Delete{dbi.ObjectName}({dbi.Fields[0].DataType} {dbi.Fields[0].ParameterName})");
+                            sw.WriteLine($"        {{"); //start Delete
+                            sw.WriteLine($"            if (Disposed)");
+                            sw.WriteLine($"                throw new ObjectDisposedException(typeof(DbManager).FullName);");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(3)}using (DbCommand command = Connection.CreateCommand())");
-                            sw.WriteLine($"{IndentCs(3)}{{"); //start DbCommand
-                            sw.WriteLine($"{IndentCs(4)}command.CommandType = CommandType.Text;");
-                            sw.WriteLine($"{IndentCs(4)}command.CommandText = Requests[\"{dbi.ObjectName}\"][\"Delete{dbi.ObjectName}\"];");
+                            sw.WriteLine($"            using (DbCommand command = Connection.CreateCommand())");
+                            sw.WriteLine($"            {{"); //start DbCommand
+                            sw.WriteLine($"                command.CommandType = CommandType.Text;");
+                            sw.WriteLine($"                command.CommandText = Requests[\"{dbi.ObjectName}\"][\"Delete{dbi.ObjectName}\"];");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(4)}if (Transaction != null)");
-                            sw.WriteLine($"{IndentCs(5)}command.Transaction = Transaction;");
+                            sw.WriteLine($"                if (Transaction != null)");
+                            sw.WriteLine($"                    command.Transaction = Transaction;");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(4)}command.Parameters.Add(CreateParameter(\"{dbi.Fields[0].ParameterName}\", {dbi.Fields[0].ParameterName}));");
+                            sw.WriteLine($"                command.Parameters.Add(CreateParameter(\"{dbi.Fields[0].ParameterName}\", {dbi.Fields[0].ParameterName}));");
                             sw.WriteLine();
-                            sw.WriteLine($"{IndentCs(4)}return command.ExecuteNonQuery();");
-                            sw.WriteLine($"{IndentCs(3)}}}"); //start DbCommand
-                            sw.WriteLine($"{IndentCs(2)}}}"); //end Delete
+                            sw.WriteLine($"                return command.ExecuteNonQuery();");
+                            sw.WriteLine($"            }}"); //start DbCommand
+                            sw.WriteLine($"        }}"); //end Delete
                             first = false;
                         }
 
-                        sw.WriteLine($"{IndentCs(1)}}}"); //end class
+                        sw.WriteLine($"    }}"); //end class
                         sw.WriteLine("}"); //end namespace
                     }
                 }
             }
-        }
-
-        private string IndentCs(int nbIndent)
-        {
-            return new string(_codeGenerationSettings.CSharpIndentType == "SPACES" ? ' ' : '\t', _codeGenerationSettings.CSharpIndentSize * nbIndent);
-        }
-
-        private string IndentSql(int nbIndent)
-        {
-            return new string(_codeGenerationSettings.SqlIndentType == "SPACES" ? ' ' : '\t', _codeGenerationSettings.SqlIndentSize * nbIndent);
         }
     }
 }
