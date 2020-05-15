@@ -114,7 +114,7 @@ namespace DotNetToolBox.DbManagerCodeGenerator
                         sw.WriteLine();
                         sw.WriteLine($"namespace {_objectsNamespace}");
                         sw.WriteLine("{"); //start namespace
-                        sw.WriteLine($"    public class {dbi.ObjectName} : IDbObject");
+                        sw.WriteLine($"    public class {dbi.ObjectName}");
                         sw.WriteLine($"    {{"); //start class
 
                         foreach (DbField field in dbi.Fields)
